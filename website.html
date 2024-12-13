@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orcus.wiki</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+            background-color: #f4f7fa;
+            color: #333;
+        }
+
+        .landing-page {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #89cff0, #89c);
+            color: white;
+            text-align: center;
+        }
+
+        .landing-page h1 {
+            font-size: 3.5rem;
+            font-weight: bold;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .section {
+            padding: 50px 10%;
+            text-align: center;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #4e54c8;
+        }
+
+        .image-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 50px 10%;
+            flex-wrap: wrap;
+        }
+
+        .image-section:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .image-section img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .image-container {
+            width: 40%;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .macbook-style {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background: #dfe4ea;
+            border-bottom: 2px solid #c8d6e5;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .macbook-style span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .macbook-style .red {
+            background: #ff6b6b;
+        }
+
+        .macbook-style .yellow {
+            background: #ffeaa7;
+        }
+
+        .macbook-style .green {
+            background: #6ab04c;
+        }
+
+        .text {
+            width: 50%;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .course-section {
+            background: #ffffff;
+            padding: 50px 10%;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-section h3 {
+            margin-bottom: 20px;
+            color: #4e54c8;
+        }
+
+        .courses {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .course {
+            flex: 1;
+            max-width: 300px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f4f7fa;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .course:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .email-section {
+            background: linear-gradient(135deg, #8f94fb, #4e54c8);
+            padding: 50px 10%;
+            text-align: center;
+            color: white;
+        }
+
+        .iframe-container {
+            width: 100%;
+            max-width: 800px; /* Limit width for larger screens */
+            aspect-ratio: 4 / 3; /* Maintain aspect ratio */
+            margin: 20px auto;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        @media (max-width: 768px) {
+            .image-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .text, .image-container {
+                width: 100%;
+            }
+
+            .landing-page h1 {
+                font-size: 2rem;
+            }
+
+            .section h2 {
+                font-size: 1.5rem;
+            }
+
+            .text {
+                font-size: 1rem;
+            }
+
+            .course-section h3 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-page">
+        <h1>Welcome to Orcus.wiki</h1>
+    </div>
+
+    <div class="section">
+        <h2>Who Needs This Website?</h2>
+        <p>Upcoming Entrepreneurs, Investors, Next Problem Solvers.</p>
+    </div>
+
+    <div class="image-section">
+        <div class="text">
+            <h2>What You Get</h2>
+            <p>Book recommendations: startups, business, ideation, execution, growth, and mindset.</p>
+            <p>Our aim is to help individuals achieve a deeper understanding of the startup world.</p>
+        </div>
+        <div class="image-container">
+            <div class="macbook-style">
+                <span class="red"></span>
+                <span class="yellow"></span>
+                <span class="green"></span>
+            </div>
+            <img src="book2.png" alt="Vision">
+        </div>
+    </div>
+
+    <div class="image-section">
+        <div class="image-container">
+            <div class="macbook-style">
+                <span class="red"></span>
+                <span class="yellow"></span>
+                <span class="green"></span>
+            </div>
+            <img src="start.png" alt="Mission">
+        </div>
+        <div class="text">
+            <br></br>
+            <p>Detailed startup notes and starter stories (how they built their startups).</p>
+            <p>Startup notes, vocabulary, business terms, frameworks, and founder lexicons.</p>
+        </div>
+    </div>
+
+    <div class="course-section">
+        <h3>What We Offer</h3>
+        <div class="courses">
+            <div class="course">Book Recommendations</div>
+            <div class="course">Startup Strategies</div>
+            <div class="course">Startup Stories</div>
+            <div class="course">Founder Notes</div>
+        </div>
+    </div>
+
+    <div class="email-section">
+        <h3>Stay Updated</h3>
+        <p>Subscribe to receive updates and notifications when we launch!</p>
+        <div class="iframe-container">
+            <iframe 
+                src="https://docs.google.com/forms/d/e/1FAIpQLSeslxnB_Osf8aVtTtNpYc01bU_Sr07e9RdeP1hOC9QkzdsDeg/viewform?usp=header">
+                Loading…
+            </iframe>
+        </div>
+        <p>Your privacy is our priority.</p>
+        <p>Contact: alexatorcus.wiki@gmail.com</p>
+    </div>
+</body>
+</html>
