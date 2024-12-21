@@ -18,12 +18,13 @@
       background-color: #1f3cd0;
       color: white;
       text-align: center;
-      padding: 300px 155px;
+      padding: 300px 150px;
     }
 
     .landing h1 {
-      font-size: 2.5em;
+      font-size: 2.5em; /* Default font size for larger screens */
       margin: 0;
+      word-wrap: break-word; /* Ensures text doesn't overflow */
     }
 
     .landing p {
@@ -92,25 +93,44 @@
       background-color: #26438c;
     }
 
-    /* Responsive Design */
-    @media (max-width: 600px) {
+    /* Responsive Design for Smaller Screens */
+    @media (max-width: 1200px) {
       .landing h1 {
-        font-size: 2em;
+        font-size: 2.2em; /* Adjusted for medium-sized screens */
+      }
+    }
+
+    @media (max-width: 768px) {
+      .landing h1 {
+        font-size: 1.8em; /* Adjusted for tablets */
       }
 
       .landing p {
-        font-size: 1em;
+        font-size: 1em; /* Adjust text size for readability on tablets */
+      }
+
+      .landing {
+        padding: 150px 80px; /* Adjust padding for smaller screens */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .landing h1 {
+        font-size: 1.5em; /* Further reduced font size for mobile */
+      }
+
+      .landing p {
+        font-size: 0.9em; /* Smaller text for mobile */
+      }
+
+      .landing {
+        padding: 100px 40px; /* Less padding for mobile */
       }
 
       .box {
         width: 300px;
         height: 150px; /* Makes the box square for mobile */
         margin: 10px 0; /* Adds spacing between stacked boxes */
-      }
-
-      .box div {
-        font-size: 14px; /* Adjusts text size for smaller boxes */
-        padding: 10px; /* Ensures text is properly spaced */
       }
 
       .boxes-container {
