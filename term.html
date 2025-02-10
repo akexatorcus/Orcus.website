@@ -63,24 +63,28 @@
       cursor: pointer;
     }
 
-    @media (max-width: 480px) {
-  .boxes-container {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    width: 100%;
-    padding: 20px 0;
-  }
-
-  .box {
-    width: 90%;
-    height: 150px; /* Adjusted height for mobile */
-    margin: 0 auto; /* Centering the box */
-    scroll-snap-align: center;
-    flex: 0 0 auto;
-  }
+/* Default: Mobile (1 column) */
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 20px;
 }
+
+/* Tablet: 2 columns */
+@media (min-width: 600px) {
+    .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 900px) {
+    .grid-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 
   </style>
 </head>
