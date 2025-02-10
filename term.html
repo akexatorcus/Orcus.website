@@ -63,29 +63,29 @@
       cursor: pointer;
     }
 
-/* Default: Mobile (1 column) */
-.grid-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-    padding: 20px;
-}
+ /* Responsive Design for Smaller Screens */
+ @media (max-width: 480px) {
+      .boxes-container {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding: 20px 10px;
+      }
 
-/* Tablet: 2 columns */
-@media (min-width: 600px) {
-    .grid-container {
-        grid-template-columns: repeat(2, 1fr);
+      .box {
+        min-width: 90%;
+        max-width: 90%;
+        height: 150px;
+        scroll-snap-align: center;
+        flex: 0 0 auto;
+      }
+
+      .button {
+        padding: 8px 16px;
+        font-size: 12px;
+      }
     }
-}
-
-/* Desktop: 3 columns */
-@media (min-width: 900px) {
-    .grid-container {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-
   </style>
 </head>
 <body>
