@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
+     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-V0RXSJDE2J"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -10,419 +10,122 @@
 
   gtag('config', 'G-V0RXSJDE2J');
 </script>
-  <meta name="description" content="A website that help you to build a startup!.">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Website for creating  entrepreneurs</title>
- 
-  <style>
-    /* General Reset */
-    body, html {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      box-sizing: border-box;
-    }
 
-    /* Landing Page Section */
-    .landing {
-      background-color: #1f3cd0;
-      color: white;
-      text-align: center;
-      padding: 300px 150px;
-    }
-
-    .landing h1 {
-      font-size: 2.5em; /* Default font size for larger screens */
-      margin: 0;
-      word-wrap: break-word; /* Ensures text doesn't overflow */
-    }
-
-    .landing p {
-      font-size: 1.2em;
-      margin: 10px 0 20px;
-    }
-
-    .landing button {
-      padding: 15px 30px;
-      font-size: 1em;
-      color: white;
-      background-color: #db283b;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.2s ease;
-    }
-
-    .landing button:active {
-      opacity: 0.8;
-    }
-
-    /* Boxes Section */
-    .boxes-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-      padding: 20px;
-      background-color: #d1dbfc;
-    }
-
-    .box {
-      width: 400px;
-      height: 200px;
-      background-color: #a5b7fa;
-      border-radius: 15px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: white;
-      font-weight: bold;
-    }
-
-    .button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: #526ce2;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: transform 0.2s ease, background-color 0.2s ease;
-    }
-
-    .button:active {
-      transform: scale(1.05);
-      background-color: #26438c;
-    }
-    .but-red{
-      width: 180px;
-      font-size: 1em;
-      color: white;
-      background-color: #db283b;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    /* Responsive Design for Smaller Screens */
-    @media (max-width: 1200px) {
-      .landing h1 {
-        font-size: 2.2em; /* Adjusted for medium-sized screens */
-      }
-    }
-
-    @media (max-width: 768px) {
-      .landing h1 {
-        font-size: 1.8em; /* Adjusted for tablets */
-      }
-
-      .landing p {
-        font-size: 1em; /* Adjust text size for readability on tablets */
-      }
-
-      .landing {
-        padding: 260px 80px; /* Adjust padding for smaller screens */
-      }
-    }
-
-    @media (max-width: 480px) {
-      .landing h1 {
-        font-size: 1.5em; /* Further reduced font size for mobile */
-      }
-
-      .landing p {
-        font-size: 0.9em; /* Smaller text for mobile */
-      }
-
-      .landing {
-        padding: 100px 40px; /* Less padding for mobile */
-      }
-
-      .box {
-        width: 300px;
-        height: 150px; /* Makes the box square for mobile */
-        margin: 10px 0; /* Adds spacing between stacked boxes */
-      }
-
-      .boxes-container {
-        flex-direction: column; /* Stacks the boxes vertically */
-        align-items: center; /* Centers the boxes in the container */
-      }
-
-      .button {
-        padding: 8px 16px;
-        font-size: 12px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A website that help you to build a startup!.">
+    <title>Website for creating  entrepreneurs</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            color: black;
+            text-align: center;
+        }
+        .landing {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgb(12, 80, 255);;
+            color: white;
+            padding: 20px;
+        }
+        .landing h1 {
+            font-weight: bolder;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        .landing p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #5a67d8;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background-color: #434190;
+        }
+        .section  {
+            padding: 80px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            color: #3138B8B8;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bolder;
+        }
+        .section p1 {
+            color: grey;
+        }
+        .image-section img {
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            margin-top: 20px;
+            border-radius: 12px;
+        }
+        .btn1{
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color:white;
+            color:#434190 ;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.3s;
+            
+        }
+        .btn1:active{
+            background-color: rgb(179, 185, 190);
+        }
+        @media (max-width: 768px) {
+            .section {
+                padding: 50px 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- Landing Page -->
-  <div class="landing">
-    <h1>&#8220;Welcome to Orcus.&#8221;</h1>
-    <p></p>
-    <button onclick="scrollToBoxes()">Explore Terms &#187;</button>
-      <br></br>
-    <button onclick="location.href='founder.html'">Founders Note &#187;</button>
-     <br></br>
-    <button class="but-red" onclick="location.href='subscribe.html'">Subscribe &#187;</button>
-      
-  </div>
-
-  <!-- Boxes Section -->
-  <div class="boxes-container">
-
-    <div class="box">
-      <div >Acceleration</div>
-      <br></br>
-      <button class="button" onclick="location.href='Acceleration.html'">READ</button>
+    <div class="landing">
+        <h1>Welcome to Orcus.wiki</h1>
+        <p>“Information is power. But like all power, there are those who want to keep it for themselves.”
+          <br></br>  ― Aaron Swartz</p>
+        <a href="#main" class="btn1">Explore More</a>
     </div>
-
-    <div class="box">
-      <div>Acquisition</div>
-      <br></br>
-      <button class="button" onclick="location.href='Acquisition.html'">READ</button>
+    
+    <div id="main">
+        <div class="section">
+            <h1>Welcome to Orcus.wiki</h1>
+            <p1>
+                Explore startup terms that are commonly used.</p>
+            <a href="term.html" class="btn">Learn</a>
+        </div>
+        
+        <div class="section" id="about">
+            <h2>What We Do</h2>
+            <p1>Founders notes is for those who want to become a founder. We give here all the knowledge from top CEOs and founders.</p>
+            <a href="founder.html" class="btn">Learn</a>
+        </div>
+        
+        <div class="section image-section" id="explore">
+            <h2>Join the Knowledge Revolution</h2>
+            <img src="substak.png" alt="Substake!">
+            <p1>Subscribe to our Substack, and you will get weekly founder notes, podcasts, and more!</p>
+            <a href="subscribe.html" class="btn">Subscribe</a>
+        </div>
     </div>
-
-    <div class="box">
-      <div>Agile</div>
-      <br></br>
-      <button class="button" onclick="location.href='Agile.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Building in public</div>
-      <br></br>
-      <button class="button" onclick="location.href='building.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Death valley curve</div>
-      <br></br>
-      <button class="button" onclick="location.href='Death.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Discovery phase</div>
-      <br></br>
-      <button class="button" onclick="location.href='Discovery.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Disruptor</div>
-      <br></br>
-      <button class="button" onclick="location.href='Disruptor.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Dogfooding</div>
-      <br></br>
-      <button class="button" onclick="location.href='Dogfooding.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Earliy adopter</div>
-      <br></br>
-      <button class="button" onclick="location.href='Earliy.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Evangelist</div>
-      <br></br>
-      <button class="button" onclick="location.href='Evangelist.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Exit</div>
-      <br></br>
-      <button class="button" onclick="location.href='Exit.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Freemium</div>
-      <br></br>
-      <button class="button" onclick="location.href='freemium.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>𝗚𝗼 𝘁𝗼 𝗺𝗮𝗿𝗸𝗲𝘁 (𝗚𝗧𝗠)</div>
-      <br></br>
-      <button class="button" onclick="location.href='go.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Growth Hacking</div>
-      <br></br>
-      <button class="button" onclick="location.href='growth.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Hackathon</div>
-      <br></br>
-      <button class="button" onclick="location.href='hackathon.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Incubator</div>
-      <br></br>
-      <button class="button" onclick="location.href='incubator.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Key Performance Indicator (KPI)</div>
-      <br></br>
-      <button class="button" onclick="location.href='key.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Lean startup</div>
-      <br></br>
-      <button class="button" onclick="location.href='lean.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Liquidation</div>
-      <br></br>
-      <button class="button" onclick="location.href='liquidation.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Minimum viable product (MVP)</div>
-      <br></br>
-      <button class="button" onclick="location.href='mvp.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Out Sourcing</div>
-      <br></br>
-      <button class="button" onclick="location.href='out.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Piggy backing</div>
-      <br></br>
-      <button class="button" onclick="location.href='piggy.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Pitch deck</div>
-      <br></br>
-      <button class="button" onclick="location.href='pitch.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Pivot</div>
-      <br></br>
-      <button class="button" onclick="location.href='pivot.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Product-market fit</div>
-      <br></br>
-      <button class="button" onclick="location.href='fit.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Product roadmap</div>
-      <br></br>
-      <button class="button" onclick="location.href='roadmap.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Proof of concept (POC)</div>
-      <br></br>
-      <button class="button" onclick="location.href='proof.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Scaling</div>
-      <br></br>
-      <button class="button" onclick="location.href='scaling.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Senior entrepreneur</div>
-      <br></br>
-      <button class="button" onclick="location.href='senior.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Software-as-a-service (SaaS)</div>
-      <br></br>
-      <button class="button" onclick="location.href='saas.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>solopreneur</div>
-      <br></br>
-      <button class="button" onclick="location.href='solo.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Sprint</div>
-      <br></br>
-      <button class="button" onclick="location.href='sprint.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Stealth mod startup</div>
-      <br></br>
-      <button class="button" onclick="location.href='mod.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Stock holder</div>
-      <br></br>
-      <button class="button" onclick="location.href='holder.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Tech due diligence</div>
-      <br></br>
-      <button class="button" onclick="location.href='diligence.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Unicorpse</div>
-      <br></br>
-      <button class="button" onclick="location.href='unicorpse.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>UX and UI</div>
-      <br></br>
-      <button class="button" onclick="location.href='ux.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Validation</div>
-      <br></br>
-      <button class="button" onclick="location.href='validation.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Value proposition</div>
-      <br></br>
-      <button class="button" onclick="location.href='proposition.html'">READ</button>
-    </div>
-
-    <div class="box">
-      <div>Wire framing </div>
-      <br></br>
-      <button class="button" onclick="location.href='wire.html'">READ</button>
-    </div>
-      
-    <!-- Add more boxes as needed -->
-  </div>
-
-  <script>
-    function scrollToBoxes() {
-      document.querySelector('.boxes-container').scrollIntoView({ behavior: 'smooth' });
-    }
-  </script>
 </body>
 </html>
+
