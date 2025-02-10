@@ -1,51 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- 
- 
+  <meta charset="UTF-8" />
+  <!-- Ensure proper scaling on mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Responsive Boxes</title>
   <style>
-    /* General Reset */
-    body, html {
+    /* ======================
+       GENERAL RESET & BASE
+    ====================== */
+    * {
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
       box-sizing: border-box;
     }
+    body,
+    html {
+      font-family: Arial, sans-serif;
+    }
 
-    /* Boxes Section */
+    /* ======================
+       BASE STYLES FOR CONTAINER & BOXES
+    ====================== */
+    /* The container’s styling will be modified in media queries */
     .boxes-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-      padding: 20px;
       background-color: #f9f9f9;
-    }
-        /* Boxes Section */
-        .boxes-container {
-      display: grid;
-      grid-template-columns: 1fr; /* Default: Mobile (1 column) */
-      gap: 15px;
       padding: 20px;
-      background-color: #f9f9f9;
     }
-
-  
-
 
     .box {
-      width: 400px;
-      height: 200px;
       background-color: whitesmoke;
       border-radius: 10px;
+      color: #434190;
+      font-weight: bold;
+      text-align: center;
+      /* Box shadow for desktop/tablet view */
+      box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.3);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      color: #434190;
-      font-weight: bold;
-      box-shadow: 10px 10px 15px  rgba(0, 0, 0, 0.3);
     }
 
     .button {
@@ -64,7 +58,8 @@
       transform: scale(1.05);
       background-color: #26438c;
     }
-    .but-red{
+
+    .but-red {
       width: 180px;
       font-size: 1em;
       color: white;
@@ -74,294 +69,431 @@
       cursor: pointer;
     }
 
+    /* ======================================
+       MOBILE STYLES (max-width: 480px)
+       - Fullscreen boxes
+       - Horizontal swiping using flex + scroll snap
+    ====================================== */
+    @media (max-width: 480px) {
+      /* Remove page scrolling so boxes fill the viewport */
+      body,
+      html {
+        overflow: hidden;
+      }
+      .boxes-container {
+        display: flex;
+        flex-wrap: nowrap;
+        /* Enable horizontal scrolling */
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        /* Remove extra padding so boxes fill the screen */
+        padding: 0;
+      }
+      .box {
+        /* Make each box take full viewport width & height */
+        flex: 0 0 100vw;
+        height: 100vh;
+        scroll-snap-align: center;
+        /* Optional: remove border radius and box-shadow on mobile */
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+
+    /* ======================================
+       TABLET STYLES (min-width: 481px) and (max-width: 768px)
+       - Two columns grid layout
+    ====================================== */
+    @media (min-width: 481px) and (max-width: 768px) {
+      /* Reset body overflow for scrolling if needed */
+      body,
+      html {
+        overflow: auto;
+      }
+      .boxes-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+      .box {
+        /* Use an appropriate height */
+        height: 200px;
+      }
+    }
+
+    /* ======================================
+       DESKTOP STYLES (min-width: 769px)
+       - Three columns grid layout
+    ====================================== */
+    @media (min-width: 769px) {
+      .boxes-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+      }
+      .box {
+        height: 200px;
+      }
+    }
+
+    /* ======================================
+       OPTIONAL: Existing blog-content adjustments
+       (You can remove these if not used)
+    ====================================== */
     @media (max-width: 768px) {
-            .blog-content h2 {
-                font-size: 1.5em;
-            }
-
-            .blog-content p {
-                font-size: 0.9em;
-            }
-
-            .blog-card h3 {
-                font-size: 1em;
-            }
-
-            body {
-                padding: 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .blog-content h2 {
-                font-size: 1.2em;
-            }
-
-            .blog-content p {
-                font-size: 0.8em;
-            }
-
-            .blog-card h3 {
-                font-size: 0.9em;
-            }
-
-            .read-more {
-                font-size: 0.8em;
-            }
-        }
+      .blog-content h2 {
+        font-size: 1.5em;
+      }
+      .blog-content p {
+        font-size: 0.9em;
+      }
+      .blog-card h3 {
+        font-size: 1em;
+      }
+      body {
+        padding: 10px;
+      }
+    }
+    @media (max-width: 480px) {
+      .blog-content h2 {
+        font-size: 1.2em;
+      }
+      .blog-content p {
+        font-size: 0.8em;
+      }
+      .blog-card h3 {
+        font-size: 0.9em;
+      }
+      .read-more {
+        font-size: 0.8em;
+      }
+    }
   </style>
 </head>
 <body>
-
   <div class="boxes-container">
-
+    <!-- Box 1 -->
     <div class="box">
-      <div >Acceleration</div>
-      <br></br>
-      <button class="button" onclick="location.href='Acceleration.html'">READ</button>
+      <div>Acceleration</div>
+      <br />
+      <button class="button" onclick="location.href='Acceleration.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 2 -->
     <div class="box">
       <div>Acquisition</div>
-      <br></br>
-      <button class="button" onclick="location.href='Acquisition.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='Acquisition.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 3 -->
     <div class="box">
       <div>Agile</div>
-      <br></br>
-      <button class="button" onclick="location.href='Agile.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='Agile.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 4 -->
     <div class="box">
       <div>Building in public</div>
-      <br></br>
-      <button class="button" onclick="location.href='building.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='building.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 5 -->
     <div class="box">
       <div>Death valley curve</div>
-      <br></br>
-      <button class="button" onclick="location.href='Death.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='Death.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 6 -->
     <div class="box">
       <div>Discovery phase</div>
-      <br></br>
-      <button class="button" onclick="location.href='Discovery.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='Discovery.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 7 -->
     <div class="box">
       <div>Disruptor</div>
-      <br></br>
-      <button class="button" onclick="location.href='Disruptor.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='Disruptor.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 8 -->
     <div class="box">
       <div>Dogfooding</div>
-      <br></br>
-      <button class="button" onclick="location.href='Dogfooding.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='Dogfooding.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 9 -->
     <div class="box">
       <div>Earliy adopter</div>
-      <br></br>
-      <button class="button" onclick="location.href='Earliy.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='Earliy.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 10 -->
     <div class="box">
       <div>Evangelist</div>
-      <br></br>
-      <button class="button" onclick="location.href='Evangelist.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='Evangelist.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 11 -->
     <div class="box">
       <div>Exit</div>
-      <br></br>
-      <button class="button" onclick="location.href='Exit.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='Exit.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 12 -->
     <div class="box">
       <div>Freemium</div>
-      <br></br>
-      <button class="button" onclick="location.href='freemium.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='freemium.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 13 -->
     <div class="box">
       <div>𝗚𝗼 𝘁𝗼 𝗺𝗮𝗿𝗸𝗲𝘁 (𝗚𝗧𝗠)</div>
-      <br></br>
-      <button class="button" onclick="location.href='go.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='go.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 14 -->
     <div class="box">
       <div>Growth Hacking</div>
-      <br></br>
-      <button class="button" onclick="location.href='growth.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='growth.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 15 -->
     <div class="box">
       <div>Hackathon</div>
-      <br></br>
-      <button class="button" onclick="location.href='hackathon.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='hackathon.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 16 -->
     <div class="box">
       <div>Incubator</div>
-      <br></br>
-      <button class="button" onclick="location.href='incubator.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='incubator.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 17 -->
     <div class="box">
       <div>Key Performance Indicator (KPI)</div>
-      <br></br>
-      <button class="button" onclick="location.href='key.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='key.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 18 -->
     <div class="box">
       <div>Lean startup</div>
-      <br></br>
-      <button class="button" onclick="location.href='lean.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='lean.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 19 -->
     <div class="box">
       <div>Liquidation</div>
-      <br></br>
-      <button class="button" onclick="location.href='liquidation.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='liquidation.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 20 -->
     <div class="box">
       <div>Minimum viable product (MVP)</div>
-      <br></br>
-      <button class="button" onclick="location.href='mvp.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='mvp.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 21 -->
     <div class="box">
       <div>Out Sourcing</div>
-      <br></br>
-      <button class="button" onclick="location.href='out.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='out.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 22 -->
     <div class="box">
       <div>Piggy backing</div>
-      <br></br>
-      <button class="button" onclick="location.href='piggy.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='piggy.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 23 -->
     <div class="box">
       <div>Pitch deck</div>
-      <br></br>
-      <button class="button" onclick="location.href='pitch.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='pitch.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 24 -->
     <div class="box">
       <div>Pivot</div>
-      <br></br>
-      <button class="button" onclick="location.href='pivot.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='pivot.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 25 -->
     <div class="box">
       <div>Product-market fit</div>
-      <br></br>
-      <button class="button" onclick="location.href='fit.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='fit.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 26 -->
     <div class="box">
       <div>Product roadmap</div>
-      <br></br>
-      <button class="button" onclick="location.href='roadmap.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='roadmap.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 27 -->
     <div class="box">
       <div>Proof of concept (POC)</div>
-      <br></br>
-      <button class="button" onclick="location.href='proof.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='proof.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 28 -->
     <div class="box">
       <div>Scaling</div>
-      <br></br>
-      <button class="button" onclick="location.href='scaling.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='scaling.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 29 -->
     <div class="box">
       <div>Senior entrepreneur</div>
-      <br></br>
-      <button class="button" onclick="location.href='senior.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='senior.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 30 -->
     <div class="box">
       <div>Software-as-a-service (SaaS)</div>
-      <br></br>
-      <button class="button" onclick="location.href='saas.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='saas.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 31 -->
     <div class="box">
       <div>solopreneur</div>
-      <br></br>
-      <button class="button" onclick="location.href='solo.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='solo.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 32 -->
     <div class="box">
       <div>Sprint</div>
-      <br></br>
-      <button class="button" onclick="location.href='sprint.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='sprint.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 33 -->
     <div class="box">
       <div>Stealth mod startup</div>
-      <br></br>
-      <button class="button" onclick="location.href='mod.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='mod.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 34 -->
     <div class="box">
       <div>Stock holder</div>
-      <br></br>
-      <button class="button" onclick="location.href='holder.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='holder.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 35 -->
     <div class="box">
       <div>Tech due diligence</div>
-      <br></br>
-      <button class="button" onclick="location.href='diligence.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='diligence.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 36 -->
     <div class="box">
       <div>Unicorpse</div>
-      <br></br>
-      <button class="button" onclick="location.href='unicorpse.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='unicorpse.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 37 -->
     <div class="box">
       <div>UX and UI</div>
-      <br></br>
-      <button class="button" onclick="location.href='ux.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='ux.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 38 -->
     <div class="box">
       <div>Validation</div>
-      <br></br>
-      <button class="button" onclick="location.href='validation.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='validation.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 39 -->
     <div class="box">
       <div>Value proposition</div>
-      <br></br>
-      <button class="button" onclick="location.href='proposition.html'">READ</button>
+      <br />
+      <button class="button" onclick="location.href='proposition.html'">
+        READ
+      </button>
     </div>
-
+    <!-- Box 40 -->
     <div class="box">
-      <div>Wire framing </div>
-      <br></br>
-      <button class="button" onclick="location.href='wire.html'">READ</button>
+      <div>Wire framing</div>
+      <br />
+      <button class="button" onclick="location.href='wire.html'">
+        READ
+      </button>
     </div>
-      
     <!-- Add more boxes as needed -->
   </div>
-
-  <script>
-    function scrollToBoxes() {
-      document.querySelector('.boxes-container').scrollIntoView({ behavior: 'smooth' });
-    }
-  </script>
 </body>
 </html>
+
