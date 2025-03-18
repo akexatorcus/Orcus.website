@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <!-- Google tag (gtag.js) -->
+          <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-V0RXSJDE2J"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -10,171 +10,221 @@
 
   gtag('config', 'G-V0RXSJDE2J');
 </script>
-
+     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A website that help you to build a startup!.">
-    <title>Website for creating  entrepreneurs</title>
-    <!-- Font Awesome CSS (make sure you have internet connectivity or download the file locally) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Orcus Wiki - Coming Soon</title>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
+        /* Reset and Base Styles */
+        * {
             margin: 0;
             padding: 0;
-            background-color: white;
-            color: black;
-            text-align: center;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .landing {
-            height: 100vh;
+
+        body {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        .hero {
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            background: rgb(12, 80, 255);;
-            color: white;
-            padding: 20px;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0,0,0,0.5);
         }
-        .landing h1 {
-            font-weight: bolder;
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-        .landing p {
-            font-size: 1.2rem;
-            opacity: 0.8;
-        }
-        .btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 24px;
-            background-color: #5a67d8;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: background 0.3s;
-        }
-        .btn:hover {
-            background-color: #434190;
-        }
-        .section  {
-            padding: 80px 20px;
-            max-width: 900px;
-            margin: 0 auto;
-            color: #3138B8B8;
-            font-family: Arial, Helvetica, sans-serif;
-            font-weight: bolder;
-        }
-        .section p1 {
-            color: grey;
-        }
-        .image-section img {
-            width: 100%;
-            max-width: 390px;
-            height: 490px;
-            margin-top: 20px;
-            border-radius: 12px;
-        }
-        .btn1{
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 24px;
-            background-color:white;
-            color:#434190 ;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: background 0.3s;
-            
-        }
-        .btn1:active{
-            background-color: rgb(179, 185, 190);
-        }
-         hr {
-            border: none;
-            border-top: 1px dashed #ccc;
-            margin: 20px 0;
-        }
-        .social-media {
-            margin-top: 10px;
-            font-weight: bolder;
-        }
-          /* Footer styling */
-    footer {
-      background-color: #5a67d8;
-      padding: 20px 0;
-      text-align: center;
-    }
-    
-    .social-media a {
-      color: #fff;
-      margin: 0 10px;
-      font-size: 24px;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
 
-    
-    .social-media a:active {
-      color: #1da1f2; /* Example hover color */
-    }
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #00ff9d;
+        }
+
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Subscription Form */
+        .subscription {
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        input[type="email"] {
+            width: 100%;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        button {
+            background: #00ff9d;
+            color: #1a1a1a;
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.3s ease;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .section {
-                padding: 50px 15px;
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
             }
         }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav a {
+            color: #00ff9d;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0,0,0,0.8);
+            margin-top: 3rem;
+        }
+        .substack-iframe {
+            width: 100%;
+            height: 500px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.05);
+            margin: 2rem 0;
+        }
+
+        .substack-iframe iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Modify existing subscription CSS */
+        .subscription {
+            max-width: 800px;
+            padding: 2rem 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .substack-iframe {
+                height: 400px;
+            }
+        }
+        
     </style>
 </head>
 <body>
-    <div class="landing">
-        <h1>Welcome to Orcus.wiki</h1>
-        <p>“Information is power. But like all power, there are those who want to keep it for themselves.”
-          <br></br>  ― Aaron Swartz</p>
-        <a href="#main" class="btn1">Explore More</a>
+    <nav class="nav">
+        <a href="#home">Orcus Wiki</a>
+    </nav>
+
+    <div class="hero" id="home">
+        <div class="logo">🚀 Orcus Wiki</div>
+        <h1>We're Restructuring for a Better Experience</h1>
+        <p>Expected Launch: Q4 2024</p>
     </div>
-    
-    <div id="main">
-        <div class="section">
-            <h1>Startup Terms</h1>
-            <p1>
-                Explore startup terms that are commonly used.</p>
-            <a href="term.html" class="btn">Learn</a>
+
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon">📘</div>
+            <h3>Founder Notes</h3>
+            <p>Exclusive insights from successful startup founders</p>
         </div>
-        <hr></hr>
-        <div class="section" id="about">
-            <h2>Founders Notes</h2>
-            <p1>Founders notes is for those who want to become a founder. We give here all the knowledge from top CEOs and founders.</p>
-            <a href="founder.html" class="btn">Learn</a>
-        </div>
-        <hr></hr>
-        <div class="section image-section" id="explore">
-            <h2>Join the Knowledge Revolution</h2>
-            <img src="#" alt="Substake!">
-            <p1>Subscribe to our Substack, and you will get weekly founder notes, podcasts, and more!</p>
-            <a href="subscribe.html" class="btn">Subscribe</a>
-        </div>
-    </div>
-    <div class="social-media">
-        <!-- Social Media Section in the Footer -->
-  <footer>
-    <div class="social-media">
         
-     <!-- <a href="#" target="_blank" title="Facebook">
-        <i class="fab fa-facebook-f"></i> -->
-      </a>
-      <a href="https://x.com/OrcusWiki?t=VMKjOKVwa7yK01GagGHdIA&s=08 " target="_blank" title="Twitter">
-        <i class="fab fa-twitter"></i>
-      </a>
-      <a href="https://www.instagram.com/orcus.wiki?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" title="Instagram">
-        <i class="fab fa-instagram"></i>
-      </a>
-     <!-- <a href="https://linkedin.com" target="_blank" title="LinkedIn">
-        <i class="fab fa-linkedin-in"></i> -->
-      </a>
+        <div class="feature-card">
+            <div class="feature-icon">💡</div>
+            <h3>Startup Stories</h3>
+            <p>Case studies of successful startups from idea to IPO</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3>AI Classes</h3>
+            <p>Hands-on tutorials for building with AI</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">📰</div>
+            <h3>Tech Updates</h3>
+            <p>Daily/weekly AI & Technology news briefings</p>
+        </div>
     </div>
-  </footer>
+
+    <div class="subscription">
+        <h2>Stay Updated</h2>
+        <p>Subscribe to our Substack for early access and updates:</p>
+        
+        <div class="substack-iframe">
+            <iframe src="https://orcuswiki.substack.com/embed?dark=true" 
+                    style="background: transparent;"></iframe>
+        </div>
+
+        <p style="margin-top: 1rem; opacity: 0.8;">100% Free - No Spam - Unsubscribe Anytime</p>
     </div>
+
+
+    <footer>
+        <p>© 2024 Orcus Wiki. All content and resources completely free.</p>
+        <p>Contact: alexatorcus.wiki@gmail.com 
+           </div>
+    </footer>
 </body>
 </html>
