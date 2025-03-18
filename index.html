@@ -10,25 +10,22 @@
 
   gtag('config', 'G-V0RXSJDE2J');
 </script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark">
-    <title>Orcus Wiki - Coming Soon</title>
+    <title>Orcus Wiki - Startup Education Platform</title>
     <style>
         /* Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
-            color: #ffffff;
+            background: #f8f9fa;
+            color: #2d3436;
             line-height: 1.6;
-            min-height: 100vh;
         }
 
         /* Navigation */
@@ -37,88 +34,96 @@
             top: 0;
             width: 100%;
             padding: 1.5rem;
-            background: rgba(0,0,0,0.8);
+            background: rgba(255,255,255,0.8);
             backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
             z-index: 1000;
         }
 
-        .nav a {
-            color: #00ff9d;
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 700;
+            color: #2d3436;
             text-decoration: none;
-            font-weight: 500;
+            font-size: 1.2rem;
         }
 
         /* Hero Section */
         .hero {
             padding: 8rem 2rem 4rem;
             text-align: center;
+            animation: fadeIn 1s ease-out;
         }
 
-        .logo {
-            font-size: 3.5rem;
-            margin-bottom: 1.5rem;
-            color: #00ff9d;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Features Grid */
         .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            padding: 2rem;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
         }
 
         .feature-card {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
             padding: 2rem;
-            border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
         .feature-card:hover {
             transform: translateY(-5px);
-        }
-
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
         }
 
         /* Subscription Section */
         .subscription {
             max-width: 800px;
             margin: 4rem auto;
-            padding: 0 2rem;
+            padding: 2rem;
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            animation: scaleUp 0.8s ease-out;
+        }
+
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .substack-container {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        .substack-iframe {
             width: 100%;
             height: 500px;
-            border: none;
-            background: transparent;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
         }
 
         /* Footer */
         footer {
             text-align: center;
             padding: 3rem 2rem;
-            background: rgba(0,0,0,0.8);
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
             margin-top: 4rem;
         }
-         .substack-iframe {
-    --substack-background: transparent !important;
-}
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -126,81 +131,70 @@
                 grid-template-columns: 1fr;
             }
 
-            .substack-iframe {
-                height: 400px;
-            }
-
-            .logo {
-                font-size: 2.5rem;
-            }
-        }
-
-        @media (max-width: 480px) {
             .hero {
-                padding-top: 6rem;
+                padding: 6rem 1rem 2rem;
             }
-            
-            .feature-card {
-                padding: 1.5rem;
+
+            .subscription {
+                margin: 2rem auto;
             }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav class="nav">
-        <a href="#home">Orcus Wiki</a>
+        <div class="nav-content">
+            <a href="#" class="logo">Orcus Wiki</a>
+            <div class="nav-links">
+                <a href="#features" style="margin-right: 1.5rem; color: #2d3436; text-decoration: none;">Features</a>
+                <a href="#subscribe" style="color: #2d3436; text-decoration: none;">Subscribe</a>
+            </div>
+        </div>
     </nav>
 
-    <section class="hero" id="home">
-        <div class="logo">🚀 Orcus Wiki</div>
-        <h1>We're Building Something Amazing</h1>
-        <p>New Platform Launching Q4 2024</p>
+    <section class="hero">
+        <h1 style="font-size: 2.5rem; margin-bottom: 1.5rem;">Master Startup Building</h1>
+        <p style="color: #636e72; max-width: 600px; margin: 0 auto;">
+            Learn through 100+ practical lessons, founder insights, and AI-powered learning tools.You will receive an email from the Orcus team when Orcus.Wiki launches its service and future uptades .
+        </p>
     </section>
 
-    <div class="features">
+    <section id="features" class="features">
         <div class="feature-card">
-            <div class="feature-icon">📘</div>
-            <h3>Founder Notes</h3>
-            <p>Raw insights from successful startup founders</p>
+            <h3 style="margin-bottom: 1rem;">Founder Notes</h3>
+            <p style="color: #636e72;">Direct insights from successful startup founders</p>
         </div>
         
         <div class="feature-card">
-            <div class="feature-icon">💡</div>
-            <h3>Startup Stories</h3>
-            <p>From garage to unicorn - real growth journeys</p>
+            <h3 style="margin-bottom: 1rem;">AI Classes</h3>
+            <p style="color: #636e72;">Hands-on tutorials for building with AI</p>
         </div>
         
         <div class="feature-card">
-            <div class="feature-icon">🤖</div>
-            <h3>AI Masterclass</h3>
-            <p>Build practical AI applications from scratch</p>
+            <h3 style="margin-bottom: 1rem;">Case Studies</h3>
+            <p style="color: #636e72;">Detailed analysis of successful startups</p>
         </div>
         
         <div class="feature-card">
-            <div class="feature-icon">📰</div>
-            <h3>Tech Briefings</h3>
-            <p>Curated AI & tech updates delivered weekly</p>
+            <h3 style="margin-bottom: 1rem;">Tech Updates</h3>
+            <p style="color: #636e72;">Curated AI & technology news</p>
         </div>
-    </div>
+    </section>
 
-    <section class="subscription">
-        <h2 style="text-align: center; margin-bottom: 1.5rem;">Stay in the Loop</h2>
+    <section id="subscribe" class="subscription">
+        <h2 style="text-align: center; margin-bottom: 1.5rem;">Stay Updated</h2>
         <div class="substack-container">
-            <iframe class="substack-iframe" 
-                    src="https://orcuswiki.substack.com/embed?dark=true"
+            <iframe src="https://orcuswiki.substack.com/embed" 
+                    style="width:100%;height:100%;border:none;background:white;"
                     frameborder="0"
                     scrolling="no"></iframe>
         </div>
-        <p style="text-align: center; margin-top: 1rem; opacity: 0.8;">
-            100% Free • No Spam • Unsubscribe Anytime
-        </p>
     </section>
 
     <footer>
-        <p>© 2024 Orcus Wiki. All resources completely free and open-access.</p>
-        <p style="margin-top: 1rem; opacity: 0.8;">
-            Contact: alexatorcus.wiki@gmail.com
-        </p>
+        <p style="color: #636e72;">© 2024 Orcus Wiki. All resources completely free</p>
+        <p style="margin-top: 1rem; color: #636e72;">Contact: alexatorcus.wiki@gmail.com</p>
     </footer>
 </body>
 </html>
