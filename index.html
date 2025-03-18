@@ -1,22 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-          <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-V0RXSJDE2J"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-V0RXSJDE2J');
-</script>
-     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
     <title>Orcus Wiki - Coming Soon</title>
-    <discription >Website for creating  entrepreneurs</discription>      
     <style>
-        /* Reset and Base Styles */
+        /* Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -28,23 +18,35 @@
             background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
             color: #ffffff;
             line-height: 1.6;
+            min-height: 100vh;
         }
 
-        /* Header Styles */
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .nav a {
+            color: #00ff9d;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Hero Section */
         .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            padding: 8rem 2rem 4rem;
             text-align: center;
-            padding: 2rem;
-            background: rgba(0,0,0,0.5);
         }
 
         .logo {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
             color: #00ff9d;
         }
 
@@ -59,10 +61,10 @@
         }
 
         .feature-card {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
             padding: 2rem;
             border-radius: 15px;
-            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
             transition: transform 0.3s ease;
         }
 
@@ -71,59 +73,38 @@
         }
 
         .feature-icon {
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin-bottom: 1rem;
         }
 
-               /* Updated Substack styles */
+        /* Subscription Section */
+        .subscription {
+            max-width: 800px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .substack-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
         .substack-iframe {
             width: 100%;
             height: 500px;
-            border-radius: 15px;
-            overflow: hidden;
-            margin: 2rem 0;
-            position: relative;
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .substack-iframe::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            backdrop-filter: blur(10px);
-            z-index: -1;
-        }
-
-        .substack-iframe iframe {
-            width: 100%;
-            height: 100%;
             border: none;
             background: transparent;
         }
 
-        /* Add this to existing CSS */
-        .subscription {
-            position: relative;
-            z-index: 1;
-        }
-
-        button {
-            background: #00ff9d;
-            color: #1a1a1a;
-            padding: 1rem 3rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: opacity 0.3s ease;
-        }
-
-        button:hover {
-            opacity: 0.9;
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(0,0,0,0.8);
+            margin-top: 4rem;
         }
 
         /* Responsive Design */
@@ -131,63 +112,25 @@
             .features {
                 grid-template-columns: 1fr;
             }
-            
-            .hero h1 {
-                font-size: 2rem;
-            }
-        }
 
-        /* Navigation */
-        .nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 1rem;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-        }
-
-        .nav a {
-            color: #00ff9d;
-            text-decoration: none;
-            margin: 0 1rem;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 2rem;
-            background: rgba(0,0,0,0.8);
-            margin-top: 3rem;
-        }
-        .substack-iframe {
-            width: 100%;
-            height: 500px;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
-            overflow: hidden;
-            background: rgba(255,255,255,0.05);
-            margin: 2rem 0;
-        }
-
-        .substack-iframe iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Modify existing subscription CSS */
-        .subscription {
-            max-width: 800px;
-            padding: 2rem 1rem;
-        }
-
-        @media (max-width: 768px) {
             .substack-iframe {
                 height: 400px;
             }
+
+            .logo {
+                font-size: 2.5rem;
+            }
         }
-        
+
+        @media (max-width: 480px) {
+            .hero {
+                padding-top: 6rem;
+            }
+            
+            .feature-card {
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -195,54 +138,56 @@
         <a href="#home">Orcus Wiki</a>
     </nav>
 
-    <div class="hero" id="home">
+    <section class="hero" id="home">
         <div class="logo">🚀 Orcus Wiki</div>
-        <h1>We're Restructuring for a Better Experience</h1>
-        <p>Expected Launch: Q4 2024</p>
-    </div>
+        <h1>We're Building Something Amazing</h1>
+        <p>New Platform Launching Q4 2024</p>
+    </section>
 
     <div class="features">
         <div class="feature-card">
             <div class="feature-icon">📘</div>
             <h3>Founder Notes</h3>
-            <p>Exclusive insights from successful startup founders</p>
+            <p>Raw insights from successful startup founders</p>
         </div>
         
         <div class="feature-card">
             <div class="feature-icon">💡</div>
             <h3>Startup Stories</h3>
-            <p>Case studies of successful startups from idea to IPO</p>
+            <p>From garage to unicorn - real growth journeys</p>
         </div>
         
         <div class="feature-card">
             <div class="feature-icon">🤖</div>
-            <h3>AI Classes</h3>
-            <p>Hands-on tutorials for building with AI</p>
+            <h3>AI Masterclass</h3>
+            <p>Build practical AI applications from scratch</p>
         </div>
         
         <div class="feature-card">
             <div class="feature-icon">📰</div>
-            <h3>Tech Updates</h3>
-            <p>Daily/weekly AI & Technology news briefings</p>
+            <h3>Tech Briefings</h3>
+            <p>Curated AI & tech updates delivered weekly</p>
         </div>
     </div>
 
-    <div class="subscription">
-        <h2>Stay Updated</h2>
-        <p>Subscribe to our Substack for early access and updates:</p>
-        
-        <div class="substack-iframe">
-            <iframe src="https://orcuswiki.substack.com/embed?dark=true" 
-                    style="background: transparent;"
+    <section class="subscription">
+        <h2 style="text-align: center; margin-bottom: 1.5rem;">Stay in the Loop</h2>
+        <div class="substack-container">
+            <iframe class="substack-iframe" 
+                    src="https://orcuswiki.substack.com/embed?dark=true"
                     frameborder="0"
                     scrolling="no"></iframe>
         </div>
-
+        <p style="text-align: center; margin-top: 1rem; opacity: 0.8;">
+            100% Free • No Spam • Unsubscribe Anytime
+        </p>
+    </section>
 
     <footer>
-        <p>© 2024 Orcus Wiki. All content and resources completely free.</p>
-        <p>Contact: alexatorcus.wiki@gmail.com 
-           </div>
+        <p>© 2024 Orcus Wiki. All resources completely free and open-access.</p>
+        <p style="margin-top: 1rem; opacity: 0.8;">
+            Contact: [email protected] • Follow our progress on [Social Media Links]
+        </p>
     </footer>
 </body>
 </html>
