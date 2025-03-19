@@ -141,11 +141,16 @@
       color: rgb(12,80,255);
       margin-bottom: 15px;
       font-size: 2rem;
+      text-align: center;
     }
     .section p {
       margin-bottom: 20px;
       font-size: 1.1rem;
+      text-align: center;
     }
+    /* Original Button Styles */
+    .section .btn1,
+    .section .btn2,
     .section .btn3 {
       padding: 12px 25px;
       background-color: #5a67d8;
@@ -154,30 +159,27 @@
       border-radius: 8px;
       transition: background 0.3s;
       font-size: 1rem;
-      margin-left: 130px;
-    
-    }
-    .section .btn2 {
-      padding: 12px 25px;
-      background-color: #5a67d8;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      transition: background 0.3s;
-      font-size: 1rem;
-      margin-left: 150px;
-    
     }
     .section .btn1 {
-      padding: 12px 25px;
-      background-color: #5a67d8;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      transition: background 0.3s;
-      font-size: 1rem;
       margin-left: 135px;
-    
+      text-align: center;
+      width: 150px;
+      height: 40px;
+    }
+    .section .btn2 {
+      margin-left: 150px;
+      text-align: center;
+      width: 150px;
+      height: 40px;
+    }
+    .section .btn3 {
+      margin-left: 130px;
+      text-align: center;
+      width: 180px;
+      height: 40px;
+    }
+    .section .btn:hover {
+      background-color: #434190;
     }
     .text0 {
         font-weight: bold;
@@ -188,20 +190,16 @@
     .h2 {
         text-align: center;
     }
-    .section .btn:hover {
-      background-color: #434190;
-    }
-    .social-media {
-            margin-top: 10px;
-            font-weight: bolder;
-        }
-          /* Footer styling */
+    /* Footer styling */
     footer {
       background-color: #5a67d8;
       padding: 5px 0;
       text-align: center;
     }
-    
+    .social-media {
+      margin-top: 10px;
+      font-weight: bolder;
+    }
     .social-media a {
       color: #fff;
       margin: 0 10px;
@@ -209,17 +207,23 @@
       text-decoration: none;
       transition: color 0.3s;
     }
-
-    
     .social-media a:active {
-      color: #1da1f2; /* Example hover color */
+      color: #1da1f2;
     }
-        @media (max-width: 768px) {
-            .section {
-                padding: 50px 15px;
-            }
-        }
-
+    @media (max-width: 768px) {
+      .section {
+        padding: 50px 15px;
+      }
+    }
+    /* Mobile-Specific Adjustments for Centering Buttons */
+    @media (max-width: 600px) {
+      .section a.btn1,
+      .section a.btn2,
+      .section a.btn3 {
+        display: block;
+        margin: 10px auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -245,7 +249,7 @@
   <!-- Full-Screen Landing Page -->
   <section class="hero">
     <h1>Empower Your Journey</h1>
-    <p >"Information is power. But like all power, there are those who want to keep it for themselves." <br></br>― Aaron Swartz</p>
+    <p>"Information is power. But like all power, there are those who want to keep it for themselves." <br>― Aaron Swartz</p>
     <a href="#sections" class="btn">Get Started</a>
   </section>
   
@@ -273,26 +277,14 @@
   <!-- Footer -->
   <footer>
     <div class="social-media">
-        <!-- Social Media Section in the Footer -->
-  <footer>
-    <div class="social-media">
-        
-     <!-- <a href="#" target="_blank" title="Facebook">
-        <i class="fab fa-facebook-f"></i> -->
-      </a>
-      <a href="https://x.com/OrcusWiki?t=VMKjOKVwa7yK01GagGHdIA&s=08 " target="_blank" title="Twitter">
+      <a href="https://x.com/OrcusWiki?t=VMKjOKVwa7yK01GagGHdIA&s=08" target="_blank" title="Twitter">
         <i class="fab fa-twitter"></i>
       </a>
       <a href="https://www.instagram.com/orcus.wiki?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" title="Instagram">
         <i class="fab fa-instagram"></i>
       </a>
-     <!-- <a href="https://linkedin.com" target="_blank" title="LinkedIn">
-        <i class="fab fa-linkedin-in"></i> -->
-      </a>
     </div>
-  </footer>
-    </div>
-    <p style="color: white; margin-top: 4px; margin-bottom: 4px;">&copy; 2025 Orcus.wiki. All Rights Reserved. version 1.3</p>
+    <p style="color: white; margin-top: 4px; margin-bottom: 4px;">&copy; 2025 Orcus.wiki. All Rights Reserved.version 1.3</p>
   </footer>
   
   <!-- JavaScript for Toggling the Menu Modal -->
