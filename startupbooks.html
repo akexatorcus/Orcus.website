@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Ubuntu+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #0a0a0a;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .cyber-container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .cyber-text {
+            font-size: 8rem;
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff,
+                         0 0 20px #0ff,
+                         0 0 30px #0ff;
+            animation: glitch 2s infinite, float 3s ease-in-out infinite;
+            position: relative;
+            filter: contrast(1.2);
+        }
+
+        .cyber-text::before,
+        .cyber-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+
+        .cyber-text::before {
+            animation: glitch-1 1s infinite;
+            color: #f0f;
+            z-index: -1;
+        }
+
+        .cyber-text::after {
+            animation: glitch-2 1s infinite;
+            color: #0f0;
+            z-index: -2;
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            background: radial-gradient(circle, #0ff 20%, transparent 70%);
+            border-radius: 50%;
+            mix-blend-mode: screen;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) infinite ease-in-out;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        @keyframes glitch-1 {
+            0% { clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%); }
+            100% { clip-path: polygon(0 15%, 100% 15%, 100% 15%, 0 15%); }
+        }
+
+        @keyframes glitch-2 {
+            0% { clip-path: polygon(0 78%, 100% 78%, 100% 100%, 0 100%); }
+            100% { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        .gradient-shadow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, 
+                rgba(0, 255, 255, 0.4) 0%,
+                rgba(0, 255, 255, 0.2) 30%,
+                transparent 70%);
+            filter: blur(30px);
+            z-index: -1;
+        }
+
+        @media (max-width: 768px) {
+            .cyber-text {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-container">
+        <div class="gradient-shadow"></div>
+        <h1 class="cyber-text" data-text="COMING SOON">COMING SOON</h1>
+    </div>
+
+    <script>
+        // Create particle effect
+        function createParticles() {
+            const container = document.body;
+            for (let i = 0; i < 100; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.width = Math.random() * 4 + 1 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.animation = `move ${Math.random() * 5 + 5}s linear infinite`;
+                container.appendChild(particle);
+            }
+        }
+
+        // Create starry background
+        function createStars() {
+            const container = document.body;
+            for (let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.setProperty('--duration', `${Math.random() * 3 + 1}s`);
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                container.appendChild(star);
+            }
+        }
+
+        // Mouse interaction particles
+        document.addEventListener('mousemove', (e) => {
+            const particles = Array.from({ length: 5 }, () => {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = e.clientX + 'px';
+                particle.style.top = e.clientY + 'px';
+                particle.style.width = '8px';
+                particle.style.height = '8px';
+                particle.style.animation = 'explode 1s ease-out forwards';
+                return particle;
+            });
+
+            particles.forEach(p => {
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 1000);
+            });
+        });
+
+        // Random glitch intensity
+        setInterval(() => {
+            const text = document.querySelector('.cyber-text');
+            text.style.filter = `contrast(${1 + Math.random() * 0.5}) 
+                                blur(${Math.random()}px)`;
+        }, 3000);
+
+        // Initialize effects
+        createStars();
+        createParticles();
+
+        // Parallax effect
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            document.querySelector('.cyber-container').style.transform = 
+                `translate(${x}px, ${y}px)`;
+        });
+    </script>
+</body>
+</html>
