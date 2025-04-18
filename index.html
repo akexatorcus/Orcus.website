@@ -1,327 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-V0RXSJDE2J"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-     
-  gtag('config', 'G-V0RXSJDE2J');
- </script>
-
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Orcus.wiki</title>
-  <meta name="description" content="A website that helps you build a startup!">
-  <!-- Font Awesome CSS for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>orcus.wiki</title>
   <style>
-    /* Reset & Base Styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #fff;
-      color: #333;
-      overflow-x: hidden;
-    }
-    /* Header */
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background-color: rgb(12,80,255);
-      color: white;
-      padding: 15px 20px;
-      position: fixed;
-      width: 100%;
-      top: 0;
-      left: 0;
-      z-index: 1001;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    header .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-    header .menu-icon {
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    /* Menu Modal Overlay */
-    .menu-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .menu-modal.open {
-      display: flex;
-    }
-    .menu-container {
-      background: rgba(186, 209, 250, 0.95);
-      padding: 30px;
-      border-radius: 10px;
-      width: 80%;
-      max-width: 300px;
-      text-align: center;
-    }
-    .menu-container nav a {
-      display: block;
-      margin: 15px 0;
-      color: rgb(12,80,255);
-      text-decoration: none;
-      font-size: 1.2rem;
-      font-weight: 600;
-      transition: color 0.3s;
-    }
-    .menu-container nav a:hover {
-      color: #434190;
-    }
-    /* Hero Section (Full-Screen Landing Page) */
+    /* Root spacing variable */
+    :root { --spacer: 2rem; }
+
+    /* Reset & base */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: Arial, sans-serif; color: #111; }
+
+    /* Header & nav */
+    header { width:100%; background:#fff; }
+    .top-nav { display:flex; justify-content:space-between; align-items:center; padding: 15px; }
+    .top-nav .logo { font-size:1.5rem; font-weight:bold; }
+    .top-nav .menu a { margin-left:1.5rem; font-size:.9rem; color:#111; text-decoration:none; letter-spacing:1px; font-family: 'Georgia', 'Times New Roman', serif; }
+    .top-nav .menu a:hover { text-decoration:none;color: #55a8ef;}
+    hr { border:none; border-top:1px solid #ddd; margin: 0; }
+
+    /* Tagline bar */
+    .tagline { padding: 7px; font-style:italic; font-size:.95rem; background:#fafafa; }
+    .tagline a { color:#007acc; text-decoration:none; }
+    .tagline a:hover { text-decoration:underline; }
+
+    /* Hero */
     .hero {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      height: 100vh;
-      background-color: rgb(12,80,255);
-      color: white;
-      padding: 40px 20px;
+      position:relative;
+      background: url('hero.jpg') no-repeat center center;
+      background-size:cover;
+      color:#111;
+      text-align:center;
+      padding: 4%;
+      padding-bottom: calc(4% + 4rem);
     }
-    .hero h1 {
-      font-size: 3rem;
-      margin-bottom: 20px;
-    }
-    .hero p {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
-      max-width: 600px;
-    }
+    .hero h1 { font-size:2rem; margin-block: var(--spacer) 0; line-height:1.3; }
     .hero .btn {
-      display: inline-block;
-      padding: 15px 30px;
-      background-color: #434190;
-      color: white;
+      display:inline-block;
+      margin-block: var(--spacer) 0;
+      padding:.50rem 2rem;
+      background:#55a8ef;
+      color:#000;
+      text-decoration:none;
+      font-style:italic;
+      transition: .2s;
+      font-size: small;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      
+    }
+    .hero .btn:hover { background:#357ABD; }
+    /* Ensure text sits above overlapping image and closer to top */
+    .hero .second,
+    .hero .new {
+      position: relative;
+      z-index: 2;
+      margin-block-start: 1rem;
+    }
+
+    /* Overlapping image (pulled up less to give text more room) */
+    .hero .image {
+      width: 100%;
+      margin: -1rem auto 0;
+      position: relative;
+      z-index: 1;
+    }
+    .hero .image img {
+      display: block;
+      width: 100%;
+      height: auto;
+      
+      
+    }
+    .hr{
+      color: black;
+    }
+    .below {
+      color: #000000;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      text-align: center;
+      padding-bottom: 5px;
+      font-size: 14px;
+      
+    }
+    .text{
+      color: #000000;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      text-align: center;
+      padding-bottom: 5px;
+      font-size: 14px;
+    }
+    .bottom {
+      color: #000000;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 14px;
+      text-align: center;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      margin-left: 18px;
       text-decoration: none;
-      border-radius: 8px;
-      transition: background-color 0.3s;
     }
-    .hero .btn:hover {
-      background-color: #5c5a9e;
-    }
-    /* Main Content Container (Increased Size) */
-    .content {
-      padding: 30px 20px;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    /* Enlarged Section Styles */
-    .section {
-      margin-bottom: 30px;
-      padding: 40px 30px;
-      background-color: #fff;
-      border: 1px solid #eee;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .section h2 {
-      color: rgb(12,80,255);
-      margin-bottom: 15px;
-      font-size: 2rem;
-      text-align: center;
-    }
-    .section p {
-      margin-bottom: 20px;
-      font-size: 1.1rem;
-      text-align: center;
-    }
-    /* Original Button Styles */
-    .section .btn1,
-    .section .btn2,
-    .section .btn3 {
-      padding: 12px 25px;
-      background-color: #5a67d8;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      transition: background 0.3s;
-      font-size: 1rem;
-    }
-    .section .btn1 {
-      margin-left: 135px;
-      text-align: center;
-      width: 150px;
-      height: 40px;
-    }
-    .section .btn2 {
-      margin-left: 150px;
-      text-align: center;
-      width: 150px;
-      height: 40px;
-    }
-    .section .btn3 {
-      margin-left: 130px;
-      text-align: center;
-      width: 180px;
-      height: 40px;
-    }
-    .section .btn:hover {
-      background-color: #434190;
-    }
-    .text0 {
-        font-weight: bold;
-        margin-bottom: 10px;
-        color: #616060;
-        text-align: center;
-    }
-    .h2 {
-        text-align: center;
-    }
-    /* Footer styling */
-    footer {
-      background-color: #5a67d8;
-      padding: 5px 0;
-      text-align: center;
-    }
-    .social-media {
-      margin-top: 10px;
-      font-weight: bolder;
-    }
-    .social-media a {
-      color: #fff;
-      margin: 0 10px;
-      font-size: 24px;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    .social-media a:active {
-      color: #1da1f2;
-    }
-    @media (max-width: 768px) {
-      .section {
-        padding: 50px 15px;
-      }
-    }
-    /* Mobile-Specific Adjustments for Centering Buttons */
-    @media (max-width: 600px) {
-      .section a.btn1,
-      .section a.btn2,
-      .section a.btn3 {
-        display: block;
-        margin: 10px auto;
-      }
-    }
+
+
+    /* Footer spacer so content doesn’t cut off */
+    footer { height:2rem; }
   </style>
+
+<script>
+  function openAbout() {
+    const tpl = document.getElementById('about-template').innerHTML;
+    const win = window.open('', '_blank');
+    win.document.write(tpl);
+    win.document.close();
+  }
+</script>
+
 </head>
 <body>
-  <!-- Header with Logo & Hamburger Menu -->
+
   <header>
-    <div class="logo">Orcus.wiki</div>
-    <div class="menu-icon" id="menuToggle">
-      <i class="fas fa-bars"></i>
-    </div>
-  </header>
-  
-  <!-- Menu Modal Overlay (Centered Toggle Menu) -->
-  <div class="menu-modal" id="menuModal">
-    <div class="menu-container">
-      <nav>
-        <a href="term.html">Startup Terms</a>
-        <a href="founder.html">Founders Notes</a>
-        <a href="subscribe.html">Subscribe</a>
-        <a onclick="location.href='#aboutus'">About</a>
+    <div class="top-nav">
+      <div class="logo">orcus<span style="font-weight:300;">.</span>wiki</div>
+      <nav class="menu">
+        <a href="#" onclick="openAbout()">ABOUT</a>
+        <a href="#" onclick="openSubscribe()">SUBSCRIBE</a>
       </nav>
     </div>
-  </div>
-  
-  <!-- Full-Screen Landing Page -->
-  <section class="hero">
-    <h1>Empower Your Journey</h1>
-    <p>"Information is power. But like all power, there are those who want to keep it for themselves." <br>― Aaron Swartz</p>
-    <a href="#sections" class="btn">Get Started</a>
-  </section>
-  
-  <!-- Main Content with Enlarged Containers -->
-  <div class="content" id="sections">
-
-    <section class="section">
-        <h2 class="h2">Startup Books</h2>
-        <p class="text0">Essential Reads for Entrepreneurs</p>
-        <a href="startupbooks.html" class="btn1">Explore</a>
-    </section>
-
-    <section class="section">
-      <h2 class="h2">Startup Terms</h2>
-      <p class="text0">Discover the language of startups and learn the key terms every entrepreneur needs.</p>
-      <a href="term.html" class="btn1">Learn More</a>
-    </section>
-    
-    <section class="section">
-      <h2 class="h2">Founders Notes</h2>
-      <p class="text0">Gain insights from top founders and industry leaders to help drive your startup's success.</p>
-      <a href="founder.html" class="btn2">Explore</a>
-    </section>
-    
-    <section class="section">
-      <h2 class="h2">Join the Community</h2>
-      <p class="text0">Subscribe for weekly updates, podcasts, and exclusive content to fuel your entrepreneurial spirit.</p>
-      <a href="subscribe.html" class="btn3">Subscribe Now</a>
-    </section>
-
-    <!-- About -->
-     <section   class="section">
-        <div id="aboutus">
-            <h2 class="h2">About Us</h2>
-            <p class="text0">Follow Site Founder & Author on Alex(Abin)-<a href="https://x.com/AbinJos44798706?t=2s-eOH5M4mn7tWATgM0ACQ&s=08 " target="_blank">Twitter</a> Harshith- <a href="https://x.com/HARSHITHADOOR?t=FmyRq5RCUZQZiMn2Jk-FIg&s=08 " target="_blank">Twitter</a> </p>
-            <p class="text0">At Orcus, we offer everything you need to drive your entrepreneurial experience. From potent tools and experienced resources to motivation and assistance, we're here to enable you to translate ideas into influence. Whether starting small or growing large, Orcus is your final launchpad to success.</p>
-            <p class="text0">Email: alexatorcus.wiki@gmail.com</p>
-        </div>
-     </section>
-  </div>
-<!-- Footer -->
-  <footer>
-    <div class="social-media">
-      <a href="https://x.com/OrcusWiki?t=VMKjOKVwa7yK01GagGHdIA&s=08" target="_blank" title="Twitter">
-        <i class="fab fa-twitter"></i>
-      </a>
-      <a href="https://www.instagram.com/orcus.wiki?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" title="Instagram">
-        <i class="fab fa-instagram"></i>
-      </a>
+    <div class="tagline">
+      Follow Site Founder &amp; Author on&nbsp;<a href="https://twitter.com/" target="_blank">Twitter</a>
     </div>
-    <p style="color: white; margin-top: 4px; margin-bottom: 4px;">&copy; 2025 Orcus.wiki. All Rights Reserved.<br></br>version 1.4</p>
-  </footer>
-  
-  <!-- JavaScript for Toggling the Menu Modal -->
-  <script>
-    const menuToggle = document.getElementById('menuToggle');
-    const menuModal = document.getElementById('menuModal');
-    
-    menuToggle.addEventListener('click', function() {
-      menuModal.classList.toggle('open');
-    });
-    
-    // Close modal if clicking outside the menu container
-    menuModal.addEventListener('click', function(e) {
-      if(e.target === menuModal) {
-        menuModal.classList.remove('open');
-      }
-    });
-  </script>
+    <hr>
+  </header>
 
-   
+  <section class="hero">
+    <div class="second">
+      <h1>Subscribe to orcus Substack</h1>
+      <a href="#" class="btn">SUBSCRIBE</a>
+    </div>
+
+    <div class="new">
+      <h1>Upcoming Features*</h1>
+      <a href="#" class="btn">Explore</a>
+    </div>
+
+    <div class="image">
+      <img src="orcusimage.jpg" alt="image">
+    </div>
+  </section>
+
+  <footer class="below">
+    <hr style="border-top: 1px solid #000000; margin: 1rem 0;margin-left: 15px;margin-right: 15px;">
+    <a href="about" class="bottom" onclick="openAbout()">About</a>
+    <a href="about" class="bottom" onclick="openAbout()">Contact</a>
+    <br></br>
+    <h class="text">Copyright © 2024 orcus.wiki . All Rights Reserved.</h>
+    <br>
+  </footer>
+
+
+    <!--───────────────────────────────────────-->
+  <!-- This template holds your entire About page -->
+  <template id="about-template">
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <title>About-orcus.wiki</title>
+      <style>
+        body, html {
+          margin: 0;
+          padding: 0;
+          font-family: Arial, sans-serif;
+        }
+        nav {
+          background: #ffffff;
+          padding: 1rem 2rem;
+          display: flex;
+          gap: 1rem;
+        }
+        nav a {
+          margin-left:1.5rem;
+          font-size:20x;
+          color:#111;
+          text-decoration:none;
+          letter-spacing:1px;
+          font-family: 'Georgia', 'Times New Roman', serif;
+        }
+        nav a:hover {
+          text-decoration:underline ;
+          color: #55a8ef;
+        }
+        main {
+          padding: 2rem;
+          text-align: left;
+        }
+        button {
+          margin-top: 1.5rem;
+          padding: 0.5rem 1rem;
+          cursor: pointer;
+          background-color: #55a8ef;
+          font-family: 'Georgia', 'Times New Roman', serif;
+          border: none;
+          border-radius: none;
+        }
+        .text{
+          font-family: 'Georgia', 'Times New Roman', serif;
+          font-size: 14px;
+          line-height: 1.8;
+        }
+        .text1{
+          font-family: 'Georgia', 'Times New Roman', serif;
+          font-size: 14px;
+          text-align: center;
+          margin-bottom: 8px;
+        }
+
+
+      </style>
+    </head>
+    <body>
+      <nav>
+        
+        <a onclick="window.close()">HOME</a>
+        <a onclick="">SUBSCRIBE</a>
+      </nav>
+      <hr style="border-top: 1px solid #000000; margin: 1rem 0;margin-left: 15px;margin-right: 15px;">
+      
+      <main>
+        <h1 style="arial">ABOUT US</h1>
+        <p class="text">We, the two founders, are 18 years old and currently studying.Our mission is to inspire and empower the younger generation to use their ideas to build a better world through startups.
+           We hope our efforts will help someone push further in life. India may be behind in some areas today, but one day, it will be known for its vibrant startup culture.</p>
+           <h1>CONTACT</h1>
+        <p class="text">Email:alexatorcus.wiki@gmail.com / orcuswiki@gmail.com<br></br>Fellow founders</p>
+        <p class="text">Abin(Alex): <a href=" https://x.com/AbinJos44798706?t=2s-eOH5M4mn7tWATgM0ACQ&s=08 ">Twitter</a></p>
+        <p class="text">Harshith: <a href=" https://x.com/HARSHITHADOOR?t=FmyRq5RCUZQZiMn2Jk-FIg&s=08 ">Twitter</a></p>
+        <button onclick="window.close()">Go Back</button>
+      </main>
+      <hr style="border-top: 1px solid #000000; margin: 1rem 0;margin-left: 15px;margin-right: 15px;">
+      <footer class="text1">
+        <h>Copyright © 2024 orcus.wiki . All Rights Reserved.</h>
+      </footer>
+    </body>
+    </html>
+  </template>
+<template id="subscribe-box-container">
+  
 </body>
 </html>
 
