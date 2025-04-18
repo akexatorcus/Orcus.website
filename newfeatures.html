@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Orcus Wiki — All In One</title>
+  <style>
+    /* Reset & Base */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Arial, sans-serif;
+      color: #111;
+      /* overflow: hidden;  <-- uncomment this to hide the scrollbar completely */
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* Navbar */
+    header {
+      border-bottom: 1px solid #000;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 10;
+    }
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+    }
+    .brand {
+      font-size: 1.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+    .navbar nav a {
+      margin-left: 1rem;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+    }
+    .subnav {
+      font-style: italic;
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+    }
+
+    /* Sections */
+    section {
+      padding: 2rem 1rem;
+    }
+
+    /* Hero */
+    #home {
+      position: relative;
+      background: url('https://your‑domain.com/path/to/hero‑image.jpg') no-repeat center/cover;
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    #home::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.85);
+    }
+    #home .content {
+      position: relative;
+      max-width: 700px;
+      z-index: 1;
+    }
+    #home h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    #home p {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .substack-embed {
+      width: 100%;
+      max-width: 480px;
+      height: 200px;
+      border: none;
+    }
+
+    /* Features */
+    #features .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .feature-item {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .feature-item h3 {
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    .feature-item p {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    /* CTA */
+    .cta {
+      text-align: center;
+      margin: 2rem 0;
+    }
+    .btn {
+      padding: 0.75rem 2rem;
+      background: #4da6ff;
+      color: #fff;
+      font-style: italic;
+      border: none;
+      border-radius: 4px;
+      cursor: default;
+    }
+    .text1{
+          font-family: 'Georgia', 'Times New Roman', serif;
+          font-size: 14px;
+          text-align: center;
+          margin-bottom: 8px;
+        }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <header>
+    <div class="navbar">
+      <div class="brand">Orcus.Wiki</div>
+    </div>
+    <div class="subnav">
+      Exciting updates &amp; insights—all on one website
+    </div>
+  </header>
+
+  <!-- NEW FEATURES -->
+  <section id="features">
+    <h2 style="text-align:center; margin-bottom:1rem;">New Features of Orcus</h2>
+    <p style="text-align:center; margin-bottom:2rem;">Stay tuned for these powerful additions:</p>
+    <div class="features">
+      <div class="feature-item">
+        <h3>1. Investor Details</h3>
+        <p>Concatenated, rich profiles of backers &amp; VCs.</p>
+      </div>
+      <div class="feature-item">
+        <h3>2. Blog</h3>
+        <p>Deep dives, tutorials &amp; industry news.</p>
+      </div>
+      <div class="feature-item">
+        <h3>3. Event Calendar</h3>
+        <p>Track startup pitches, webinars &amp; demo days.</p>
+      </div>
+      <div class="feature-item">
+        <h3>4. Funding Guide</h3>
+        <p>Step-by-step help to raise the capital you need.</p>
+      </div>
+    </div>
+    <div class="cta">
+      <button class="btn" disabled>Coming Soon… Please Wait!</button>
+    </div>
+  </section>
+  <hr style="border-top: 1px solid #000000; margin: 1rem 0;margin-left: 15px;margin-right: 15px;">
+  <footer class="text1">
+    <h>Copyright © 2024 orcus.wiki . All Rights Reserved.</h>
+  </footer>
+
+</body>
+</html>
