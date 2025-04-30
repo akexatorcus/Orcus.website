@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Orcus Startup Lessons</title>
+  <link rel="icon" href="favicon.png" type="image/png"/>
+  <style>
+    :root {
+      --bg: #fff;
+      --text: #000;
+      --muted: #333;
+      --border: #d0d0d0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+    }
+    header {
+      background: var(--bg);
+      border-bottom: 2px solid var(--text);
+    }
+    .header-top {
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+    }
+    .logo {
+      font-size: 2.5rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .header-bottom {
+      padding: 10px 40px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    nav {
+      display: flex;
+      gap: 16px;
+    }
+    nav a {
+      text-decoration: none;
+      color: var(--text);
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    nav a:hover { text-decoration: underline; }
+    .search-filter {
+      display: flex;
+      gap: 10px;
+    }
+    .search-input,
+    .filter-select {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 1rem;
+      background: var(--bg);
+      color: var(--text);
+      min-width: 150px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h2.section-title {
+      font-size: 2rem;
+      margin-bottom: 30px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    article {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    article:last-child { border-bottom: none; }
+    .post-title {
+      font-size: 1.5rem;
+      margin: 0 0 8px;
+      font-weight: bold;
+    }
+    .post-meta {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .post-snippet {
+      font-size: 1rem;
+      color: var(--muted);
+    }
+    .post-body {
+      display: none;
+      margin-top: 10px;
+    }
+    article.expanded .post-snippet { display: none; }
+    article.expanded .post-body    { display: block; }
+    @media (max-width: 600px) {
+      body { font-size: 16px; }
+      .header-top { padding: 12px 20px; }
+      .header-bottom {
+        padding: 12px 20px;
+        align-items: stretch;
+      }
+      .search-filter {
+        flex-direction: column;
+        gap: 8px;
+      }
+      nav {
+        justify-content: flex-end;
+      }
+      .container { padding: 0 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <div class="logo">orcus Daily</div>
+    </div>
+    <div class="header-bottom">
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+      </nav>
+      <div class="search-filter">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search articles…">
+        <select id="tagFilter" class="filter-select">
+          <option value="">All Tags</option>
+          <option value="Startup">Startup</option>
+          <option value="Validation">Validation</option>
+          <option value="MVP">MVP</option>
+          <option value="Iteration">Iteration</option>
+        </select>
+        <p style="color: blue;">Click to expand the lesson</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <h2 class="section-title">Startup Lessons</h2>
+
+    <!--<article data-tags="MVP Iteration" onclick="toggleArticle(this)">
+      <h3 class="post-title">Build Fast, Learn Faster</h3>
+      <div class="post-meta">
+        April 25, 2025 · <span class="tags">MVP, Iteration</span>
+      </div>
+      <p class="post-snippet">Speed, not perfection, decides early startup survival rates…</p>
+      <div class="post-body">
+        <p>Your first version doesn’t have to be perfect. Instead, focus on building a Minimum Viable Product (MVP) and getting feedback early. Every release should teach you something—what users like, what they ignore, and what needs fixing. Speed + feedback = startup survival.</p>
+      </div>
+    </article> -->
+
+    <article data-tags="name" onclick="toggleArticle(this)">
+        <h3 class="post-title">Have a Passion for What You Build</h3>
+        <div class="post-meta">
+          April 30, 2025 ·<span class="tags">Building</span>
+        </div>
+        <p class="post-snippet">It takes a lot of work to build something from the ground up. When you love what you're making, that passion is your most valuable asset. Here's why passion is important—and how you can cultivate it step by step.</p>
+        <div class="post-body">
+          <p>1. Why Passion Matters <br></br>
+            Passion drives perseverance. When things get tough—and they will—it's your passion for the project that keeps you going. Your passion shines through in your work. Users and investors can feel real enthusiasm, and it inspires trust.</p>
+          <p>2. Align Build with Belief <br></br>
+            Select projects that relate to your values or experiences. If you are passionate about sustainability, work on green products. If you have personally struggled with a task, create a tool to fix it. When your work is an expression of what you believe, passion follows naturally.</p>
+          <p>3. Set Meaningful Goals<br></br>
+            Clarify why your project exists for more than profit. Do you aim to save time for people? Enhance health? Build stronger communities? Clear, purposeful objectives remind you why every late night or difficult decision is worth it—and keeps the fire burning.</p>  
+          <p>4. Fragment Work into Creative Moments<br></br>
+            Repetitive work can make you lose steam. Set aside time for the things you enjoy most—working on a key feature, doodling a new interface, experimenting with code. Those flashes of creativity give you the energy to tackle the harder pieces.</p>
+          <p>5. Share Your Journey<br></br>
+            Share your vision with friends, family, or other builders. Sharing small achievements—your initial prototype, first sign-up, or first good comment—boosts your enthusiasm. Feedback from the community also keeps you on your toes and responsible. </p>
+          <p>6. Learn Continuously<br></br>
+            Curiosity sustains passion. Read blogs, take online classes, or go to meetups within your project's field. Each new piece of knowledge ignites new ideas and reminds you why you began building in the beginning.</p>  
+          <p>7. Embrace Challenges as Growth<br></br>
+            Failures are setbacks—not failures. When a feature fails or a test fails, view it as an opportunity to learn and grow. Overcoming challenges is confidence-building and strengthens your bond with the work.</p>
+          <p>8. Balance Intensity with Rest<br></br>
+            Burnout extinguishes passion. Make time for breaks, engage in hobbies, and nurture friendships outside your project. A rested mind perceives problems with clarity and remains creative longer.</p>  
+          <p>Conclusion : <br></br>
+            Passion isn’t just a nice-to-have; it’s the engine that drives great work. By aligning your project with your values, celebrating progress, and caring for your well-being, you’ll sustain the enthusiasm needed to build something truly meaningful—and enjoy the journey along the way.</p>
+        </div>
+      </article>
+
+      <article data-tags="MVP Iteration" onclick="toggleArticle(this)">
+        <h3 class="post-title">Building an Minimum Viable Product (MVP)</h3>
+        <div class="post-meta">
+          April 25, 2025 · <span class="tags">MVP, Iteration</span>
+        </div>
+        <p class="post-snippet">What is an MVP ( Minimum Viable Product ).....</p>
+        <div class="post-body">
+          <p>What is an MVP ( Minimum Viable Product )<br></br>
+            A Minimum Viable Product (MVP) in a startup is a reduced version of a product or service with just enough features to meet initial customers and gather feedback for further development. The MVP enables startups to test assumptions, confirm market demand, and make rapid iterations without spending too much time or money, eventually lowering the risk of releasing a product that will not be needed by customers.
+            MVP Guidelines for startups!<br></br>
+            ◉ Fast<br></br>
+            Prioritize speed in performance and delivery.<br></br>
+            ◉ Not Fancy<br></br>
+            Focus on functionality over aesthetics.
+            Focus on delivering a clean, simple, and functional experience.<br></br>
+            ◉ Iterate<br></br>
+            Build quickly, gather feedback, and continuously improve.<br></br>
+            ◉ Opinion of User<br></br>
+            Make user feedback the cornerstone of your development process.
+            Engage with users regularly to understand their needs, pain points, and preferences.
+            Ensure the product evolves to align closely with what users truly want.</p>
+        </div>
+      </article>
+
+    <!-- Add more articles with matching data-tags="Tag1 Tag2" -->
+  </div>
+
+  <script>
+    function toggleArticle(el) { el.classList.toggle('expanded'); }
+    function filterArticles() {
+      const term = document.getElementById('searchInput').value.toLowerCase();
+      const tag  = document.getElementById('tagFilter').value.toLowerCase();
+      document.querySelectorAll('article').forEach(a => {
+        const title = a.querySelector('.post-title').textContent.toLowerCase();
+        const snippet = a.querySelector('.post-snippet').textContent.toLowerCase();
+        const tags = a.getAttribute('data-tags').toLowerCase().split(' ');
+        const showBySearch = title.includes(term) || snippet.includes(term);
+        const showByTag = !tag || tags.includes(tag);
+        a.style.display = (showBySearch && showByTag) ? '' : 'none';
+      });
+    }
+    document.getElementById('searchInput').addEventListener('input', filterArticles);
+    document.getElementById('tagFilter').addEventListener('change', filterArticles);
+  </script>
+</body>
+</html>
+
