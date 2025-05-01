@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>orcus for searching startup events & hackathon</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --card-bg: #f2f2f2;
+      --border-color: #000000;
+      --accent-shadow: rgba(0, 0, 0, 0.1);
+      --border-radius: 8px;
+      --transition-speed: 0.3s;
+      --max-width: 960px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    header {
+      background: rgb(245, 244, 244);
+      color: black;
+      padding: 2rem 1rem;
+      text-align: center;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      font-weight: 400;
+      max-width: var(--max-width);
+      margin-left: auto;
+      margin-right: auto;
+      color: var(--bg-color);
+      opacity: 0.8;
+    }
+
+    main {
+      max-width: var(--max-width);
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .search-container {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .search-container input {
+      width: 100%;
+      max-width: 400px;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      transition: border-color var(--transition-speed);
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    .search-container input:focus {
+      outline: none;
+      border-color: var(--border-color);
+      box-shadow: 0 0 0 3px var(--accent-shadow);
+    }
+
+    #noResults {
+      text-align: center;
+      font-style: italic;
+      color: #555;
+      display: none;
+      margin-bottom: 1rem;
+    }
+
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .event-card {
+      background: var(--card-bg);
+      border: 1px black;
+      border-radius: var(--border-radius);
+      box-shadow: 2px 2px 0 #000;
+      transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      font-family: Georgia, 'Times New Roman', Times, serif;
+    }
+
+    
+    .event-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .event-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .event-date {
+      font-size: 0.95rem;
+      font-weight: 400;
+    }
+
+    .event-location {
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+      font-weight: 400;
+    }
+
+    .event-description {
+      flex-grow: 1;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      font-weight: 400;
+    }
+
+    .event-link {
+      align-self: flex-start;
+      text-decoration: none;
+      color: black;
+      background:white;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius);
+      font-size: 0.95rem;
+      font-weight: 600;
+      box-shadow: 4px 4px 0 #000;
+      margin-top: 10px;
+      transition: background var(--transition-speed);
+    }
+
+    .event-link:hover {
+      background: #b3b3b3;
+    }
+    
+ 
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .event-title {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Startup Events</h1>
+    
+  </header>
+  <main>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search by title, date, or location..." aria-label="Search events">
+    </div>
+    <p id="noResults">No matching events found.</p>
+    <div class="events-grid" id="eventsGrid">
+      <!--one-->
+      <article class="event-card" data-title="AWS Summit Bengaluru 2025" data-date="07-08-2025" data-location="Bengaluru">
+        <div class="event-header">
+          <h2 class="event-title">AWS Summit Bengaluru 2025</h2>
+          <time class="event-date" datetime="10:00 AM - 4:30 PM">Aug 07, 2025</time>
+        </div>
+        <p class="event-location">KTPO Exhibition Center, Whitefield, Bengaluru</p>
+        <p class="event-description">
+          Eligibility: Startups, developers, IT professionals.
+          Time:10:00 AM - 4:30 PM
+        </p>
+        <p class="event-description">
+          <strong>Highlights:</strong>
+          <ul>
+            <li>Cloud computing, AI, machine learning sessions.</li>
+          </ul>
+        </p>
+        <a href="https://aws.amazon.com/events/summits/bengaluru/" class="event-link">Registrar</a>
+      </article>
+       <!--two-->
+      <article class="event-card" data-title="TDX Bengaluru 2025 (Salesforce Developer Conference)" data-date="02-05-2025" data-location="Bengaluru">
+        <div class="event-header">
+          <h2 class="event-title">TDX Bengaluru 2025 (Salesforce Developer Conference)</h2>
+          <time class="event-date" datetime="9:00 AM - 5:00 PM">may 02-03,2025</time>
+        </div>
+        <p class="event-location"> Bengaluru</p>
+        <p class="event-description">
+          Eligibility: Salesforce developers, tech admins, enthusiasts.
+          Time:9:00 AM - 5:00 PM
+        </p>
+        <p class="event-description">
+          <strong>Highlights:</strong>
+          <ul>
+            <li>Workshops</li>
+            <li>keynote speeches</li>
+            <li>networking</li>
+          </ul>
+        </p>
+        <a href="https://www.salesforce.com/in/tdx/" class="event-link">Registrar</a>
+      </article>
+      <!--three-->
+      <article class="event-card" data-title="Startup Mixer Mumbai" data-date="07-05-2025" data-location="helsinki">
+        <div class="event-header">
+          <h2 class="event-title">Startup Mixer Mumbai</h2>
+          <time class="event-date" datetime="6:00 PM - 9:00 PM">May 5, 2025</time>
+        </div>
+        <p class="event-location">Vile Parle Station (E), Mumbai</p>
+        <p class="event-description">
+          Eligibility: Startup founders, entrepreneurs, investors.<br></br>
+          Time: 6:00 PM - 9:00 PM IST
+        </p>
+        <p class="event-description">
+          <strong>Highlights:</strong>
+          <ul>
+            <li>Informal networking</li>
+            <li>collaborations</li>
+          </ul>
+        </p>
+        <a href="https://www.eventbrite.com/e/startup-mixer-mumbai-tickets-1318524404989" class="event-link">Registrar</a>
+      </article>
+      <!--Four-->
+      <article class="event-card" data-title="Startup Mixer Pune" data-date="24-05-2025" data-location="Baner, Pune">
+        <div class="event-header">
+          <h2 class="event-title">Startup Mixer Pune</h2>
+          <time class="event-date" datetime="6:00 PM - 9:00 PM">May 24, 2025</time>
+        </div>
+        <p class="event-location">Baner, Pune</p>
+        <p class="event-description">
+          ligibility: Startup founders, entrepreneurs, investors.<br></br>
+          Time: 6:00 PM - 9:00 PM IST
+        </p>
+        <p class="event-description">
+          <strong>Highlights:</strong>
+          <ul>
+            <li>Networking and idea exchanges.</li>
+          </ul>
+        </p>
+        <a href="https://www.eventbrite.com/e/startup-mixer-pune-tickets-1318549680589" class="event-link">Registrar</a>
+      </article>
+      <!--five-->
+      <article class="event-card" data-title="New Delhi's Big Business Tech & Entrepreneur Professional Networking Affair" data-date="13-05-2025" data-location="New Delhi">
+        <div class="event-header">
+          <h2 class="event-title">New Delhi's Big Business Tech & Entrepreneur Professional Networking Affair</h2>
+          <time class="event-date" datetime="6:00 PM - 9:00 PM">May 13, 2025</time>
+        </div>
+        <p class="event-location">Food Court, New Delhi</p>
+        <p class="event-description">
+          Eligibility: Business professionals, entrepreneurs, tech leaders.<br></br>
+          Time: 6:00 PM - 9:00 PM IST
+        </p>
+        <p class="event-description">
+          <strong>Highlights:</strong>
+          <ul>
+            <li>Cross-sector networking</li>
+          </ul>
+        </p>
+        <a href="https://www.eventbrite.com/e/new-delhis-big-business-tech-entrepreneur-professional-networking-affair-tickets-140043603187" class="event-link">Registrar</a>
+      </article>
+      <!--Six-->
+      <article class="event-card" data-title="ISBA Masterclass & Networking Dinner" data-date="15-05-2025" data-location="Aurangabad">
+        <div class="event-header">
+          <h2 class="event-title">ISBA Masterclass & Networking Dinner</h2>
+          <time class="event-date" datetime="2:30 PM - 6:30 PM">May 15, 2025</time>
+        </div>
+        <p class="event-location">Chh. Sambhajinagar (Aurangabad), India</p>
+        <p class="event-description">
+          Eligibility: Startup founders, investors, ecosystem enablers.<br></br>
+          Time: 2:30 PM - 6:30 PM IST
+        </p>
+        <p class="event-description">
+          <strong>Highlights: </strong>
+          <ul>
+            <li>Masterclasses and dinner networking.</li>
+          </ul>
+        </p>
+        <a href="https://isba.in/upcoming-events/" class="event-link">Registrar</a>
+      </article>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('searchInput');
+      const events = Array.from(document.querySelectorAll('.event-card'));
+      const noResults = document.getElementById('noResults');
+
+      function filterEvents() {
+        const query = searchInput.value.trim().toLowerCase();
+        let anyVisible = false;
+
+        events.forEach(card => {
+          const title = card.getAttribute('data-title');
+          const date = card.getAttribute('data-date');
+          const location = card.getAttribute('data-location');
+          const text = card.textContent.toLowerCase();
+          const matches = [title, date, location, text].some(field => field.includes(query));
+
+          card.style.display = matches ? 'flex' : 'none';
+          if (matches) anyVisible = true;
+        });
+
+        noResults.style.display = anyVisible ? 'none' : 'block';
+      }
+
+      let debounceTimer;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(filterEvents, 200);
+      });
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
