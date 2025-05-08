@@ -1,129 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Value vs Frequency Matrix</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: white;
+    html, body {
       margin: 0;
       padding: 50px;
-    }
-
-    .container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .label {
-      font-weight: bold;
-      font-size: 24px;
-      margin-left: 20px;
-    }
-
-    .matrix-wrapper {
+      height: 100%;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      background: #fff;
       position: relative;
-      width: 220px;
-      height: 220px;
-      margin: 0 auto;
     }
 
+    /* Centered wrapper for the 2×2 grid */
+    .wrapper {
+      position: relative;
+      width: 220px;    /* 2×100px cells + 1×20px gap */
+      height: 220px;   /* 2×100px cells + 1×20px gap */
+      margin: 0 auto;
+      top: 30px;
+    }
+
+    /* The 2×2 grid of orange-bordered boxes */
     .matrix {
       display: grid;
-      grid-template-columns: repeat(2, 80px);
-      grid-template-rows: repeat(2, 80px);
-      gap: 10px;
-      margin-left: 60px;
-      margin-top: 40px;
+      grid-template-columns: repeat(2, 100px);
+      grid-template-rows:    repeat(2, 100px);
+      gap: 20px;
+    }
+    .matrix .cell {
+      border: 4px solid orange;
     }
 
-    .matrix div {
-      border: 2px solid orange;
-    }
-
-    .x-axis {
+    /* X-axis tick labels (Low, High) */
+    .x-tick {
       position: absolute;
-      bottom: -40px;
-      left: 70px;
-      color: orange;
+      bottom: -20px;
+      font-size: 16px;
+      color: #000;
+    }
+    .x-tick.low  { left: 50px;  /* center of first cell */ }
+    .x-tick.high { left: 170px; /* center of second cell (100 + 20 + 50) */ }
+
+    /* X-axis title */
+    .x-label {
+      position: absolute;
+      bottom: - Fiftypx;
+    bottom: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18px;
       font-weight: bold;
-    }
-
-    .y-axis {
-      position: absolute;
-      top: 70px;
-      left: -50px;
-      transform: rotate(-90deg);
-      transform-origin: left top;
       color: orange;
+    }
+
+    /* Y-axis tick labels (High, Low) */
+    .y-tick {
+      position: absolute;
+      left: -60px;
+      font-size: 16px;
+      color: #000;
+      white-space: nowrap;
+    }
+    .y-tick.high { top: 50px;  /* center of top cell */ }
+    .y-tick.low  { top: 170px; /* center of bottom cell */ }
+
+    /* Y-axis title */
+    .y-label {
+      position: absolute;
+      left: -90px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+      transform-origin: center;
+      font-size: 18px;
       font-weight: bold;
+      color: orange;
     }
 
-    .labels {
-      position: relative;
-      margin-top: 20px;
-    }
-
-    .label-top,
-    .label-bottom {
-      position: absolute;
-      width: 100%;
-      text-align: center;
-    }
-
-    .label-top {
-      top: -110px;
-    }
-
-    .label-bottom {
-      bottom: -45px;
-    }
-
-    .label-left,
-    .label-right {
-      position: absolute;
-    }
-
-    .label-left {
-      top: 10px;
-      left: 0;
-    }
-
-    .label-right {
-      top: 90px;
-      left: 0;
-    }
-
-    .orcus {
+    /* “orcus” branding in bottom-left */
+    .branding {
       position: absolute;
       bottom: 10px;
       left: 10px;
       font-size: 28px;
       font-weight: bold;
+      color: #000;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="orcus">orcus</div>
 
-    <div class="matrix-wrapper">
-      <div class="matrix">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
-      <div class="x-axis">Frequency</div>
-      <div class="y-axis">Value</div>
-      <div class="label-top" style="left: 65px;">High</div>
-      <div class="label-top" style="left: -15px;">Low</div>
-      <div class="label-left" style="top: 0;">High</div>
-      <div class="label-right" style="top: 80px;">Low</div>
+  <div class="branding">orcus</div>
+
+  <div class="wrapper">
+    <div class="matrix">
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
     </div>
+
+    <!-- X-axis ticks -->
+    <div class="x-tick low">Low</div>
+    <div class="x-tick high">High</div>
+    <div class="x-label">Frequency</div>
+
+    <!-- Y-axis ticks -->
+    <div class="y-tick high">High</div>
+    <div class="y-tick low">Low</div>
+    <div class="y-label">Value</div>
   </div>
+
 </body>
 </html>
