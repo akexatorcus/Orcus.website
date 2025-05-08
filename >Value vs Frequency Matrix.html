@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Value vs Frequency Matrix</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: white;
+      margin: 0;
+      padding: 50px;
+    }
+
+    .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .label {
+      font-weight: bold;
+      font-size: 24px;
+      margin-left: 20px;
+    }
+
+    .matrix-wrapper {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      margin: 0 auto;
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(2, 80px);
+      grid-template-rows: repeat(2, 80px);
+      gap: 10px;
+      margin-left: 60px;
+      margin-top: 40px;
+    }
+
+    .matrix div {
+      border: 2px solid orange;
+    }
+
+    .x-axis {
+      position: absolute;
+      bottom: -40px;
+      left: 70px;
+      color: orange;
+      font-weight: bold;
+    }
+
+    .y-axis {
+      position: absolute;
+      top: 70px;
+      left: -50px;
+      transform: rotate(-90deg);
+      transform-origin: left top;
+      color: orange;
+      font-weight: bold;
+    }
+
+    .labels {
+      position: relative;
+      margin-top: 20px;
+    }
+
+    .label-top,
+    .label-bottom {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+    }
+
+    .label-top {
+      top: -110px;
+    }
+
+    .label-bottom {
+      bottom: -45px;
+    }
+
+    .label-left,
+    .label-right {
+      position: absolute;
+    }
+
+    .label-left {
+      top: 10px;
+      left: 0;
+    }
+
+    .label-right {
+      top: 90px;
+      left: 0;
+    }
+
+    .orcus {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      font-size: 28px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="orcus">orcus</div>
+
+    <div class="matrix-wrapper">
+      <div class="matrix">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+      <div class="x-axis">Frequency</div>
+      <div class="y-axis">Value</div>
+      <div class="label-top" style="left: 65px;">High</div>
+      <div class="label-top" style="left: -15px;">Low</div>
+      <div class="label-left" style="top: 0;">High</div>
+      <div class="label-right" style="top: 80px;">Low</div>
+    </div>
+  </div>
+</body>
+</html>
