@@ -2,82 +2,173 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Orcus.wiki Shutdown</title>
+  <title>Orcus.wiki Shutdown Email</title>
   <style>
-    body {
-      font-family: 'Times New Roman', Times, serif;
-      line-height: 1.6;
+    * {
+      box-sizing: border-box;
       margin: 0;
-      padding: 20px;
-      background: #f9f9f9;
-      color: #333;
+      padding: 0;
     }
 
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      text-align: center;
+    body {
+      background-color: #e0e0e5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      min-height: 100vh;
     }
 
-    h1 {
-      font-size: 2rem; /* ≈ 32px */
-      margin-bottom: 1rem;
+    .mac-window {
+      width: 650px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      border: 1px solid #ccc;
     }
 
-    img {
-      display: block;
-      width: 450px;
-      max-width: 100%;
-      height: auto;
-      margin: 0 auto 1.5rem;
+    .title-bar {
+      background-color: #f4f4f8;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      border-bottom: 1px solid #d1d1d6;
     }
 
-    .message {
-      text-align: left;
-      margin-bottom: 2rem;
+    .buttons {
+      display: flex;
+      gap: 8px;
     }
 
-    .message strong {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-size: 1.1rem;
+    .circle {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
     }
 
+    .circle.red {
+      background-color: #ff5f56;
+    }
 
+    .circle.yellow {
+      background-color: #ffbd2e;
+    }
 
-    .footer-link {
-      margin-top: 1.5rem;
+    .circle.green {
+      background-color: #27c93f;
+    }
+
+    .email-container {
+      padding: 24px 32px;
+    }
+
+    .email-header p {
+      margin: 4px 0;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .email-header .label {
+      font-weight: 600;
+      color: #4a4a4a;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #d1d1d6;
+      margin: 16px 0;
+    }
+
+    .email-body p {
+      margin: 12px 0;
       font-size: 1rem;
+      line-height: 1.6;
+      color: #1c1c1e;
     }
 
-    .footer-link a {
-      color: #0066cc;
+    .email-body img {
+      display: block;
+      max-width: 100%;
+      width: 450px;
+      height: auto;
+      margin: 16px auto;
+      border: 1px solid #d1d1d6;
+      border-radius: 4px;
+    }
+
+    .email-body .signature {
+      margin-top: 24px;
+      font-style: italic;
+      color: #636366;
+    }
+
+    .email-footer {
+      margin-top: 32px;
+      font-size: 0.9rem;
+      border-top: 1px solid #d1d1d6;
+      padding-top: 16px;
+      text-align: center;
+      color: #48484a;
+    }
+
+    .email-footer a {
+      color: #0a84ff;
       text-decoration: none;
     }
 
-    .footer-link a:hover {
+    .email-footer a:hover {
       text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🚧 Orcus.wiki is Shut Down</h1>
-
-    <img src="orcus die.png" alt="Orcus.wiki shutdown illustration" />
-
-    <div class="message">
-      <p><strong>Dear Visitors,</strong></p>
-      <p>We regret to inform you that <strong>orcus.wiki</strong> has been shut down due to a lack of resources required to maintain and develop the platform further.</p>
-      <p>This decision wasn’t easy. Our goal was always to create a space for knowledge. Unfortunately, sustaining that vision demands time, funding, and technical infrastructure that are currently beyond our reach.</p>
-      <p>We’re incredibly grateful to everyone who supported us during our journey. This isn’t necessarily the end—just a pause. With the right support, <strong>orcus.wiki</strong> may return stronger in the future.</p>
-      <p>Thank you for being part of our story.</p>
-      <p>- Abin / Alex</p>
-      <p>For updates or inquiries, feel free to contact us at: <a href="mailto:alexatorcus.wiki@gmail.com">alexatorcus.wiki@gmail.com</a></p>
+  <div class="mac-window">
+    <!-- Title Bar -->
+    <div class="title-bar">
+      <div class="buttons">
+        <div class="circle red"></div>
+        <div class="circle yellow"></div>
+        <div class="circle green"></div>
+      </div>
     </div>
 
-    <div class="footer-link">
-      <p>New project [orcus4ai] → <a href="https://orcus4ai.com/" target="_blank" rel="noopener">Visit orcus4ai.com</a></p>
+    <!-- Email Content -->
+    <div class="email-container">
+      <!-- Email Header -->
+      <div class="email-header">
+        <p><span class="label">From:</span> Orcus Team &lt;<a href="mailto:alexatorcus.wiki@gmail.com">alexatorcus.wiki@gmail.com</a>&gt;</p>
+        <p><span class="label">To:</span> Orcus.wiki Visitors</p>
+        <p><span class="label">Subject:</span> 🚧 Orcus.wiki is Shut Down</p>
+        <p><span class="label">Date:</span> June 1, 2025</p>
+      </div>
+
+      <hr />
+
+      <!-- Email Body -->
+      <div class="email-body">
+        <p><strong>Dear Visitors,</strong></p>
+
+        <p>We regret to inform you that <strong>orcus.wiki</strong> has been shut down due to a lack of resources required to maintain and develop the platform further.</p>
+
+        <p>This decision wasn’t easy. Our goal was always to create a space for knowledge. Unfortunately, sustaining that vision demands time, funding, and technical infrastructure that are currently beyond our reach.</p>
+
+        <img src="orcus die.png" alt="Orcus.wiki shutdown illustration" />
+
+        <p>We’re incredibly grateful to everyone who supported us during our journey. This isn’t necessarily the end—just a pause. With the right support, <strong>orcus.wiki</strong> may return stronger in the future.</p>
+
+        <p class="signature">Thank you for being part of our story.<br />
+        – Abin / Alex</p>
+
+        <p>For updates or inquiries, feel free to contact us at <a href="mailto:alexatorcus.wiki@gmail.com">alexatorcus.wiki@gmail.com</a>.</p>
+      </div>
+
+      <!-- Email Footer / Postscript -->
+      <div class="email-footer">
+        <p>⚡ New project [orcus4ai] → <a href="https://orcus4ai.com/" target="_blank" rel="noopener">Visit orcus4ai.com</a></p>
+      </div>
     </div>
   </div>
 </body>
