@@ -122,6 +122,25 @@
     .email-footer a:hover {
       text-decoration: underline;
     }
+    .sidebar {
+  display: none;             /* hide sidebar on small screens */
+}
+.main-content {
+  width: 100%;
+}
+
+/* Once viewport is at least 768px, show sidebar */
+@media (min-width: 768px) {
+  .sidebar {
+    display: block;
+    width: 25%;
+    float: left;
+  }
+  .main-content {
+    width: 70%;
+    float: right;
+  }
+}
   </style>
 </head>
 <body>
@@ -173,3 +192,5 @@
   </div>
 </body>
 </html>
+
+
