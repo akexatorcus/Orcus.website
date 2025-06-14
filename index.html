@@ -1,7 +1,555 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-<tittle>orcus</tittle>
-    <p>orcus is not available</p>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StartupPulse - Global Startup News</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #e7e9ea;
+            line-height: 1.5;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #2f3336;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #1d9bf0, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .refresh-btn {
+            background: #1d9bf0;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .refresh-btn:hover {
+            background: #1a8cd8;
+            transform: translateY(-1px);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        .news-feed {
+            padding: 0 1rem;
+        }
+
+        .news-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #2f3336;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .news-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #1d9bf0, #8b5cf6, #f91880);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .news-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #1d9bf0;
+            transform: translateY(-2px);
+        }
+
+        .news-item:hover::before {
+            opacity: 1;
+        }
+
+        .news-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .source-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .source-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1d9bf0, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .source-details h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #e7e9ea;
+        }
+
+        .source-details .location {
+            font-size: 0.8rem;
+            color: #71767b;
+        }
+
+        .timestamp {
+            font-size: 0.8rem;
+            color: #71767b;
+        }
+
+        .news-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #e7e9ea;
+            line-height: 1.4;
+        }
+
+        .news-content {
+            font-size: 0.95rem;
+            color: #e7e9ea;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .news-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            background: rgba(29, 155, 240, 0.1);
+            color: #1d9bf0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(29, 155, 240, 0.2);
+        }
+
+        .news-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.75rem;
+            border-top: 1px solid #2f3336;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #71767b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .action-btn:hover {
+            background: rgba(29, 155, 240, 0.1);
+            color: #1d9bf0;
+        }
+
+        .share-btn {
+            background: #1d9bf0;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .share-btn:hover {
+            background: #1a8cd8;
+            transform: translateY(-1px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #71767b;
+        }
+
+        .spinner {
+            border: 2px solid #2f3336;
+            border-top: 2px solid #1d9bf0;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .filter-bar {
+            padding: 1rem;
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #2f3336;
+            color: #71767b;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: #1d9bf0;
+            color: white;
+            border-color: #1d9bf0;
+        }
+
+        @media (max-width: 640px) {
+            .nav-content {
+                padding: 0 0.75rem;
+            }
+
+            .news-item {
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .news-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .source-info {
+                width: 100%;
+            }
+
+            .timestamp {
+                align-self: flex-end;
+            }
+
+            .action-buttons {
+                gap: 0.5rem;
+            }
+
+            .action-btn {
+                padding: 0.25rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">StartupPulse</div>
+            <button class="refresh-btn" onclick="refreshFeed()">🔄 Refresh</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterNews('all')">All</button>
+            <button class="filter-btn" onclick="filterNews('funding')">Funding</button>
+            <button class="filter-btn" onclick="filterNews('acquisition')">M&A</button>
+            <button class="filter-btn" onclick="filterNews('product')">Product Launch</button>
+            <button class="filter-btn" onclick="filterNews('ipo')">IPO</button>
+            <button class="filter-btn" onclick="filterNews('leadership')">Leadership</button>
+        </div>
+
+        <div class="news-feed" id="newsFeed">
+            <div class="loading">
+                <div class="spinner"></div>
+                Loading latest startup news...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:3001/api';
+        
+        let currentFilter = 'all';
+        let newsData = [];
+        let lastUpdated = null;
+
+        function generateSourceAvatar(source) {
+            return source.charAt(0).toUpperCase();
+        }
+
+        // API Functions
+        async function fetchNews(category = 'all', limit = 20) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/news?category=${category}&limit=${limit}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching news:', error);
+                return { news: [], lastUpdated: null, total: 0 };
+            }
+        }
+
+        async function triggerRefresh() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/refresh`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Error triggering refresh:', error);
+                return { success: false, message: 'Failed to refresh' };
+            }
+        }
+
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'Unknown time';
+            
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        function renderNewsItem(item) {
+            const formattedTime = formatTimestamp(item.publishedAt || item.timestamp);
+            const tags = item.tags || ['Startup'];
+            
+            return `
+                <div class="news-item" data-category="${item.category}">
+                    <div class="news-header">
+                        <div class="source-info">
+                            <div class="source-avatar">${generateSourceAvatar(item.source)}</div>
+                            <div class="source-details">
+                                <h3>${item.source}</h3>
+                                <div class="location">${item.location || 'Global'}</div>
+                            </div>
+                        </div>
+                        <div class="timestamp">${formattedTime}</div>
+                    </div>
+                    
+                    <h2 class="news-title">${item.title}</h2>
+                    <p class="news-content">${item.content || 'Click to read more...'}</p>
+                    
+                    <div class="news-tags">
+                        ${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    
+                    <div class="news-actions">
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="likeNews('${item.id}')">
+                                <span>❤️</span> <span id="likes-${item.id}">0</span>
+                            </button>
+                            <button class="action-btn" onclick="bookmarkNews('${item.id}')">
+                                <span>🔖</span> Save
+                            </button>
+                            ${item.url ? `<button class="action-btn" onclick="window.open('${item.url}', '_blank')">
+                                <span>🔗</span> Read More
+                            </button>` : ''}
+                        </div>
+                        <button class="share-btn" onclick="shareNews('${item.id}')">Share</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function renderNewsFeed() {
+            const feed = document.getElementById('newsFeed');
+            
+            // Show loading state
+            feed.innerHTML = '<div class="loading"><div class="spinner"></div>Loading news...</div>';
+            
+            // Fetch news from API
+            const data = await fetchNews(currentFilter);
+            newsData = data.news;
+            lastUpdated = data.lastUpdated;
+            
+            if (newsData.length === 0) {
+                feed.innerHTML = '<div class="loading">No news found. Try refreshing or check your connection.</div>';
+                return;
+            }
+            
+            feed.innerHTML = newsData.map(renderNewsItem).join('');
+            
+            // Update last updated time in UI if needed
+            if (lastUpdated) {
+                console.log('Last updated:', new Date(lastUpdated).toLocaleString());
+            }
+        }
+
+        async function filterNews(category) {
+            currentFilter = category;
+            
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            await renderNewsFeed();
+        }
+
+        async function refreshFeed() {
+            const feed = document.getElementById('newsFeed');
+            const refreshBtn = document.querySelector('.refresh-btn');
+            
+            // Update UI to show loading
+            feed.innerHTML = '<div class="loading"><div class="spinner"></div>Refreshing from news sources...</div>';
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '🔄 Refreshing...';
+            
+            try {
+                // Trigger backend refresh
+                const result = await triggerRefresh();
+                
+                if (result.success) {
+                    // Fetch updated news
+                    await renderNewsFeed();
+                    
+                    // Show success message briefly
+                    const tempMsg = document.createElement('div');
+                    tempMsg.className = 'loading';
+                    tempMsg.style.color = '#1d9bf0';
+                    tempMsg.textContent = `✅ Updated! Found ${result.count} articles`;
+                    feed.insertBefore(tempMsg, feed.firstChild);
+                    
+                    setTimeout(() => {
+                        tempMsg.remove();
+                    }, 3000);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Refresh failed:', error);
+                feed.innerHTML = '<div class="loading" style="color: #f91880;">❌ Refresh failed. Please try again.</div>';
+                setTimeout(renderNewsFeed, 3000);
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = '🔄 Refresh';
+            }
+        }
+
+        function likeNews(id) {
+            const likesElement = document.getElementById(`likes-${id}`);
+            const currentLikes = parseInt(likesElement.textContent);
+            likesElement.textContent = currentLikes + 1;
+        }
+
+        function bookmarkNews(id) {
+            // In real implementation, save to user's bookmarks
+            alert('News bookmarked! (Feature coming soon)');
+        }
+
+        function shareNews(id) {
+            const newsItem = newsData.find(item => item.id === id);
+            if (navigator.share) {
+                navigator.share({
+                    title: newsItem.title,
+                    text: newsItem.content.substring(0, 100) + '...',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for browsers without Web Share API
+                navigator.clipboard.writeText(window.location.href);
+                alert('Link copied to clipboard!');
+            }
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', async () => {
+            await renderNewsFeed();
+        });
+
+        // Auto-refresh every 10 minutes
+        setInterval(async () => {
+            console.log('Auto-refreshing news feed...');
+            await renderNewsFeed();
+        }, 600000);
+    </script>
+</body>
 </html>
