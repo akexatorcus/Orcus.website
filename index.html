@@ -1,300 +1,469 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orcus.wiki - No Longer Available</title>
-    <style>
-        body {
-            background-color: #c0c0c0;
-            font-family: "MS Sans Serif", sans-serif;
-            font-size: 11px;
-            margin: 0;
-            padding: 20px;
-            color: #000000;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MirrorWithoutYou</title>
+  <style>
+    /* Minimal Tailwind-like styling (single file) */
+    :root{
+      --bg:#0b0b0f;
+      --muted:#9aa0a6;
+      --accent:#9b5cff;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: radial-gradient(ellipse at center, #0b0b0f 0%, #000000 60%);
+      color:#ddd;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    #app{
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
 
-        .window {
-            background-color: #c0c0c0;
-            border: 2px outset #c0c0c0;
-            margin: 20px auto;
-            max-width: 600px;
-            box-shadow: 2px 2px 0px #808080;
-        }
+    canvas#out{
+      width:100vw;
+      height:100vh;
+      display:block;
+      object-fit:cover;
+    }
 
-        .title-bar {
-            background: linear-gradient(90deg, #0000ff 0%, #000080 100%);
-            color: white;
-            padding: 2px 4px;
-            font-weight: bold;
-            font-size: 11px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .ui {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      background: rgba(255,255,255,0.04);
+      padding:8px 10px;
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+      color:var(--muted);
+      font-size:14px;
+    }
 
-        .title-bar-text {
-            display: flex;
-            align-items: center;
-        }
+    .ui button{
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.06);
+      color:inherit;
+      padding:6px 10px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .ui button.active{
+      background: linear-gradient(90deg,var(--accent),#00c6ff);
+      color:#08121a;
+      border:0;
+    }
 
-        .title-bar-controls {
-            display: flex;
-            gap: 2px;
-        }
+    .center-text {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align:center;
+      color: rgba(255,255,255,0.75);
+      font-size:14px;
+      line-height:1.25;
+      max-width:80vw;
+      padding:8px 14px;
+      background: rgba(0,0,0,0.25);
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+    }
 
-        .title-bar-control {
-            width: 16px;
-            height: 14px;
-            background-color: #c0c0c0;
-            border: 1px outset #c0c0c0;
-            font-size: 8px;
-            text-align: center;
-            line-height: 12px;
-            cursor: pointer;
-        }
+    .small {
+      font-size:12px;
+      color:rgba(255,255,255,0.55);
+      margin-left:6px;
+    }
 
-        .window-body {
-            padding: 20px;
-            background-color: #c0c0c0;
-        }
+    /* Permission / error message */
+    .notice {
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:20px;
+      color:#fff;
+    }
 
-        .dino-container {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 2px inset #c0c0c0;
-            background-color: #ffffff;
-        }
-
-        .dino {
-            font-family: monospace;
-            font-size: 8px;
-            line-height: 8px;
-            color: #000000;
-        }
-
-        h1 {
-            font-size: 18px;
-            font-weight: bold;
-            margin: 0 0 10px 0;
-            text-align: center;
-            color: #000080;
-        }
-
-        .error-message {
-            background-color: #ffffff;
-            border: 2px inset #c0c0c0;
-            padding: 15px;
-            margin: 15px 0;
-            font-size: 11px;
-        }
-
-        .status-bar {
-            background-color: #c0c0c0;
-            border-top: 1px solid #808080;
-            padding: 2px 4px;
-            font-size: 10px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .button {
-            background-color: #c0c0c0;
-            border: 2px outset #c0c0c0;
-            padding: 4px 12px;
-            font-size: 11px;
-            font-family: "MS Sans Serif", sans-serif;
-            cursor: pointer;
-            margin: 5px;
-        }
-
-        .button:active {
-            border: 2px inset #c0c0c0;
-        }
-
-        .contact-section {
-            background-color: #ffffff;
-            border: 2px inset #c0c0c0;
-            padding: 15px;
-            margin: 15px 0;
-        }
-
-        .contact-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #000080;
-        }
-
-        .email-box {
-            background-color: #ffffff;
-            border: 1px inset #c0c0c0;
-            padding: 5px;
-            font-family: "Courier New", monospace;
-            font-size: 10px;
-            margin: 5px 0;
-        }
-
-        .separator {
-            border-top: 1px solid #808080;
-            margin: 15px 0;
-        }
-
-        .footer {
-            text-align: center;
-            font-size: 10px;
-            color: #808080;
-            margin-top: 15px;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 640px) {
-            body {
-                padding: 10px;
-            }
-            
-            .window {
-                margin: 10px auto;
-            }
-            
-            .window-body {
-                padding: 15px;
-            }
-            
-            h1 {
-                font-size: 16px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 5px;
-            }
-            
-            .window-body {
-                padding: 10px;
-            }
-            
-            .title-bar-text {
-                font-size: 10px;
-            }
-            
-            h1 {
-                font-size: 14px;
-            }
-        }
-    </style>
+    a.link{ color:var(--accent); text-decoration:none; font-weight:600;}
+    @media (max-width:640px){
+      .ui{left:10px; top:10px; font-size:13px}
+      .center-text{font-size:13px}
+    }
+  </style>
 </head>
 <body>
-    <div class="window">
-        <div class="title-bar">
-            <div class="title-bar-text">
-                <span>📄 Orcus.wiki - Internet Explorer</span>
-            </div>
-            <div class="title-bar-controls">
-                <div class="title-bar-control">_</div>
-                <div class="title-bar-control">□</div>
-                <div class="title-bar-control">✕</div>
-            </div>
-        </div>
-        
-        <div class="window-body">
-            <div class="dino-container">
-                <div class="dino">
-                    <pre>
-            ████████████████████████
-            ██                    ██
-            ██  ████████████████  ██
-            ██  ██            ██  ██
-            ██  ██  ██    ██  ██  ██  
-            ██  ██            ██  ██
-            ██  ██████████████  ██  ██
-            ██                ██  ██
-            ██████████████████    ██
-                              ████
-                          ████
-                      ████
-                  ████
-              ████
-          ████
-                    </pre>
-                </div>
-            </div>
+  <div id="app">
+    <!-- actual visible canvas -->
+    <canvas id="out"></canvas>
 
-            <h1>⚠️ ORCUS.WIKI ⚠️</h1>
+    <!-- Hidden video and mask canvases -->
+    <video id="video" playsinline style="display:none;"></video>
+    <canvas id="mask" width="640" height="480" style="display:none;"></canvas>
 
-            <div class="error-message">
-                <strong>Error 404 - Website Not Found</strong><br><br>
-                The website you are looking for (orcus.wiki) is no longer available.
-                <br><br>
-                This site has been permanently discontinued as of 2025.
-                <br><br>
-                We apologize for any inconvenience this may cause.
-            </div>
-
-            <div class="separator"></div>
-
-            <div class="contact-section">
-                <div class="contact-title">📧 Contact Information</div>
-                <p>If you have any questions or need assistance, please contact us at:</p>
-                <div class="email-box">
-                    E-mail: alexatorcus.wiki@gmail.com
-                </div>
-                <button class="button" onclick="copyEmail()">Copy Email Address</button>
-            </div>
-
-            <div class="separator"></div>
-
-            <div class="footer">
-                © 2025 Orcus.wiki - All rights reserved<br>
-                Best viewed with Internet Explorer 3.0 or higher<br>
-                Last updated: June 14, 2025
-            </div>
-        </div>
-
-        <div class="status-bar">
-            <span>Document: Done</span>
-            <span>Internet Zone</span>
-        </div>
+    <div class="ui" id="controls">
+      <button id="startBtn">Start</button>
+      <button id="effectVoid" class="active">Void</button>
+      <button id="effectGlitch">Glitch</button>
+      <button id="effectBlur">Blur</button>
+      <div class="small">Model: <span id="modelStatus">idle</span></div>
     </div>
 
-    <script>
-        function copyEmail() {
-            const email = 'alexatorcus.wiki@gmail.com';
-            
-            // Try modern clipboard API first
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(email).then(function() {
-                    alert('Email address copied to clipboard!');
-                }).catch(function() {
-                    // Fallback to old method
-                    fallbackCopyTextToClipboard(email);
-                });
-            } else {
-                // Fallback for older browsers
-                fallbackCopyTextToClipboard(email);
+    <div class="center-text" id="ctext">
+      MirrorWithoutYou — allow camera. Your silhouette will be removed and replaced by a void.<br>
+      <span style="font-size:12px;opacity:0.8">This runs locally in your browser. No video leaves your device.</span>
+    </div>
+
+    <div class="notice" id="notice" style="display:none;"></div>
+  </div>
+
+  <!-- TensorFlow.js & BodyPix -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0.5/dist/body-pix.min.js"></script>
+
+  <script>
+    // Single-file MirrorWithoutYou implementation
+    (async function(){
+      const video = document.getElementById('video');
+      const outCanvas = document.getElementById('out');
+      const outCtx = outCanvas.getContext('2d', { alpha: false });
+      const maskCanvas = document.getElementById('mask');
+      const maskCtx = maskCanvas.getContext('2d');
+      const startBtn = document.getElementById('startBtn');
+      const notice = document.getElementById('notice');
+      const modelStatus = document.getElementById('modelStatus');
+      const ctext = document.getElementById('ctext');
+
+      let net = null;
+      let running = false;
+      let currentEffect = 'void'; // void | glitch | blur
+      const effectButtons = {
+        void: document.getElementById('effectVoid'),
+        glitch: document.getElementById('effectGlitch'),
+        blur: document.getElementById('effectBlur')
+      };
+
+      // UI helpers
+      function showNotice(msg, timeout=5000){
+        notice.style.display = 'flex';
+        notice.textContent = msg;
+        if(timeout) setTimeout(()=> notice.style.display='none', timeout);
+      }
+      function setModelStatus(s){ modelStatus.textContent = s; }
+
+      // choose model options for BodyPix (balanced perf/quality)
+      const bodyPixOptions = {
+        architecture: 'MobileNetV1',
+        outputStride: 16,
+        multiplier: 0.75,
+        quantBytes: 2
+      };
+
+      // segmentation options
+      const segmentationOptions = {
+        internalResolution: 'medium',
+        segmentationThreshold: 0.7,
+        maxDetections: 1,
+        scoreThreshold: 0.3,
+        nmsRadius: 20
+      };
+
+      // Handle effect button toggles
+      Object.entries(effectButtons).forEach(([key, btn])=>{
+        btn.addEventListener('click', ()=> {
+          currentEffect = key;
+          Object.values(effectButtons).forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+
+      // Start / Stop
+      startBtn.addEventListener('click', async ()=>{
+        if (running) {
+          stop();
+          startBtn.textContent = 'Start';
+          ctext.style.display = 'block';
+          return;
+        }
+        startBtn.disabled = true;
+        await start();
+        startBtn.disabled = false;
+      });
+
+      // Setup camera
+      async function setupCamera() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+              facingMode: 'user',
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
             }
+          });
+          video.srcObject = stream;
+          await video.play();
+          return true;
+        } catch (e) {
+          console.warn('Camera error', e);
+          showNotice('Camera access denied or not available. Use a device with a camera and allow access.', 8000);
+          return false;
+        }
+      }
+
+      // Load BodyPix model
+      async function loadModel(){
+        try{
+          setModelStatus('loading...');
+          net = await bodyPix.load(bodyPixOptions);
+          setModelStatus('ready');
+        } catch(e){
+          console.error('Model load error', e);
+          setModelStatus('error');
+          showNotice('Could not load segmentation model. Check your connection or try again later.', 8000);
+        }
+      }
+
+      // resize canvases to match viewport/resolution
+      function resizeToDisplay() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        // make canvas resolution slightly larger for quality, but keep ratio
+        outCanvas.width = Math.min(1280, Math.max(640, Math.floor(w * devicePixelRatio)));
+        outCanvas.height = Math.min(720, Math.max(480, Math.floor(h * devicePixelRatio)));
+        // mask canvas should match video resolution
+        const vW = video.videoWidth || 640;
+        const vH = video.videoHeight || 480;
+        maskCanvas.width = vW;
+        maskCanvas.height = vH;
+      }
+
+      // Animated void background (noise + radial)
+      const voidBg = {
+        t: 0,
+        draw(ctx, w, h) {
+          // gradient base
+          const g = ctx.createLinearGradient(0, 0, w, h);
+          g.addColorStop(0, '#06060a');
+          g.addColorStop(0.5, '#06090f');
+          g.addColorStop(1, '#020204');
+          ctx.fillStyle = g;
+          ctx.fillRect(0,0,w,h);
+          // animated noise (fast low-opacity rectangles)
+          const density = Math.min(0.0008 * w * h, 1500);
+          ctx.globalAlpha = 0.06;
+          for(let i=0;i<density/80;i++){
+            const x = Math.random()*w;
+            const y = Math.random()*h;
+            const size = 1 + Math.random()*2;
+            ctx.fillRect(x,y,size,size);
+          }
+          ctx.globalAlpha = 1;
+          // subtle vignette
+          const rg = ctx.createRadialGradient(w/2, h/2, Math.min(w,h)/6, w/2, h/2, Math.max(w,h)/1.2);
+          rg.addColorStop(0, 'rgba(0,0,0,0)');
+          rg.addColorStop(1, 'rgba(0,0,0,0.55)');
+          ctx.fillStyle = rg;
+          ctx.fillRect(0,0,w,h);
+        }
+      };
+
+      // draw glitch pattern (overlay for glitch effect)
+      function drawGlitchOverlay(ctx, w, h) {
+        const bandCount = 6;
+        ctx.save();
+        ctx.globalAlpha = 0.12;
+        for (let i=0;i<bandCount;i++){
+          const y = (h / bandCount) * i + (Math.sin(perfNow()/200 + i) * 8);
+          const hh = 2 + Math.random()*12;
+          ctx.fillRect(0, y + Math.random()*6, w * (0.4 + Math.random()*0.6), hh);
+        }
+        ctx.restore();
+      }
+
+      // utility perf time
+      function perfNow(){ return (performance && performance.now && performance.now()) || Date.now(); }
+
+      // main loop: draw background, video, erase person
+      async function renderLoop(){
+        if(!running) return;
+        if(video.readyState < 2){ requestAnimationFrame(renderLoop); return; }
+
+        resizeToDisplay();
+
+        const w = outCanvas.width;
+        const h = outCanvas.height;
+
+        // scale factors: we want to draw video at canvas size but mask is at video size
+        // draw void background first
+        voidBg.t += 1;
+        voidBg.draw(outCtx, w, h);
+
+        // draw video scaled to canvas (cover)
+        // compute cover transform
+        const vw = video.videoWidth;
+        const vh = video.videoHeight;
+        const scale = Math.max(w/vw, h/vh);
+        const sw = vw * scale;
+        const sh = vh * scale;
+        const sx = (w - sw) / 2;
+        const sy = (h - sh) / 2;
+        outCtx.drawImage(video, 0, 0, vw, vh, sx, sy, sw, sh);
+
+        // segmentation - run at limited frequency for perf
+        let segmentation = null;
+        try {
+          segmentation = await net.segmentPerson(video, segmentationOptions);
+        } catch (e) {
+          console.warn('segment error', e);
         }
 
-        function fallbackCopyTextToClipboard(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed";
-            textArea.style.left = "-999999px";
-            textArea.style.top = "-999999px";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            
-            try {
-                document.execCommand('copy');
-                alert('Email address copied to clipboard!');
-            } catch (err) {
-                alert('Unable to copy email. Please manually copy: ' + text);
+        if(segmentation){
+          // create mask image (person = opaque, background = transparent)
+          const maskWidth = segmentation.width;
+          const maskHeight = segmentation.height;
+          const maskImage = maskCtx.createImageData(maskWidth, maskHeight);
+          const data = maskImage.data;
+          const segData = segmentation.data;
+          for(let i=0;i<segData.length;i++){
+            const offset = i * 4;
+            if(segData[i] === 1){ // person pixel
+              data[offset] = 255;
+              data[offset+1] = 255;
+              data[offset+2] = 255;
+              data[offset+3] = 255; // opaque white
+            } else {
+              data[offset+0] = 0;
+              data[offset+1] = 0;
+              data[offset+2] = 0;
+              data[offset+3] = 0; // transparent
             }
-            
-            document.body.removeChild(textArea);
+          }
+          maskCtx.putImageData(maskImage, 0, 0);
+
+          // Draw mask onto outCanvas using composite operation to *erase* person
+          outCtx.save();
+          // scale mask canvas to the same transform we used to draw video (cover)
+          outCtx.globalCompositeOperation = 'destination-out';
+          outCtx.drawImage(maskCanvas, 0, 0, maskCanvas.width, maskCanvas.height, sx, sy, sw, sh);
+          outCtx.restore();
+
+          // Now apply effect overlays to the empty (cutout) areas as desired
+          if(currentEffect === 'glitch'){
+            // small color bands and random offsets
+            outCtx.save();
+            outCtx.globalCompositeOperation = 'source-over';
+            outCtx.globalAlpha = 0.55;
+            drawGlitchOverlay(outCtx, w, h);
+            outCtx.restore();
+          } else if(currentEffect === 'blur'){
+            // a faux blur: draw the void again slightly offset and low alpha to simulate softness
+            outCtx.save();
+            outCtx.globalCompositeOperation = 'source-over';
+            outCtx.globalAlpha = 0.14;
+            for(let i=0;i<6;i++){
+              outCtx.fillRect(0,0,0,0); // no-op but keep
+            }
+            outCtx.restore();
+            // add faint radial highlight
+            outCtx.save();
+            const rg = outCtx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w,h)/2);
+            rg.addColorStop(0, 'rgba(255,255,255,0.02)');
+            rg.addColorStop(1, 'rgba(0,0,0,0)');
+            outCtx.fillStyle = rg;
+            outCtx.fillRect(0,0,w,h);
+            outCtx.restore();
+          } else {
+            // void: maybe a subtle vignette already applied by voidBg.
+            // draw faint drifting lines to give depth
+            outCtx.save();
+            outCtx.globalAlpha = 0.06;
+            for(let i=0;i<3;i++){
+              outCtx.beginPath();
+              outCtx.moveTo(0, (h/3)*i + Math.sin(perfNow()/1000 + i)*15);
+              outCtx.lineTo(w, (h/3)*i + Math.cos(perfNow()/900 + i)*15);
+              outCtx.lineWidth = 1.5;
+              outCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+              outCtx.stroke();
+            }
+            outCtx.restore();
+          }
         }
-    </script>
+
+        // redraw center message less after start
+        ctext.style.opacity = running ? 0.0 : 1.0;
+
+        // schedule next frame
+        requestAnimationFrame(renderLoop);
+      }
+
+      // Start everything
+      async function start(){
+        ctext.style.display = 'none';
+        if(!await setupCamera()) { return; }
+        resizeToDisplay();
+
+        if(!net){
+          await loadModel();
+        }
+
+        // small warmup: run one segmentation
+        setModelStatus('warming up');
+        try{
+          await net.segmentPerson(video, segmentationOptions);
+          setModelStatus('ready');
+        }catch(e){
+          console.warn('warmup error', e);
+        }
+
+        running = true;
+        startBtn.textContent = 'Stop';
+        showNotice('Running — your silhouette will be removed locally in the browser.', 3000);
+        renderLoop();
+      }
+
+      // Stop capturing
+      function stop(){
+        running = false;
+        // stop camera tracks
+        const stream = video.srcObject;
+        if(stream){
+          const tracks = stream.getTracks();
+          tracks.forEach(t => t.stop());
+          video.srcObject = null;
+        }
+        startBtn.textContent = 'Start';
+        ctext.style.display = 'block';
+      }
+
+      // auto-load model in background to reduce start delay
+      loadModel();
+
+      // small helpful text when page first loaded
+      showNotice('Tip: allow camera access and click Start. Runs locally — no upload.', 5000);
+
+      // handle resize
+      window.addEventListener('resize', ()=> { if(video.readyState >=2) resizeToDisplay(); });
+
+    })();
+  </script>
 </body>
 </html>
