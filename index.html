@@ -1,469 +1,121 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MirrorWithoutYou</title>
-  <style>
-    /* Minimal Tailwind-like styling (single file) */
-    :root{
-      --bg:#0b0b0f;
-      --muted:#9aa0a6;
-      --accent:#9b5cff;
-    }
-    html,body{height:100%}
-    body{
-      margin:0;
-      background: radial-gradient(ellipse at center, #0b0b0f 0%, #000000 60%);
-      color:#ddd;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-    }
-    #app{
-      width:100%;
-      height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
-    }
-
-    canvas#out{
-      width:100vw;
-      height:100vh;
-      display:block;
-      object-fit:cover;
-    }
-
-    .ui {
-      position: absolute;
-      left: 18px;
-      top: 18px;
-      display:flex;
-      gap:10px;
-      align-items:center;
-      background: rgba(255,255,255,0.04);
-      padding:8px 10px;
-      border-radius: 12px;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.6);
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .ui button{
-      background:transparent;
-      border:1px solid rgba(255,255,255,0.06);
-      color:inherit;
-      padding:6px 10px;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:600;
-    }
-    .ui button.active{
-      background: linear-gradient(90deg,var(--accent),#00c6ff);
-      color:#08121a;
-      border:0;
-    }
-
-    .center-text {
-      position: absolute;
-      bottom: 36px;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align:center;
-      color: rgba(255,255,255,0.75);
-      font-size:14px;
-      line-height:1.25;
-      max-width:80vw;
-      padding:8px 14px;
-      background: rgba(0,0,0,0.25);
-      border-radius: 12px;
-      backdrop-filter: blur(6px);
-    }
-
-    .small {
-      font-size:12px;
-      color:rgba(255,255,255,0.55);
-      margin-left:6px;
-    }
-
-    /* Permission / error message */
-    .notice {
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      padding:20px;
-      color:#fff;
-    }
-
-    a.link{ color:var(--accent); text-decoration:none; font-weight:600;}
-    @media (max-width:640px){
-      .ui{left:10px; top:10px; font-size:13px}
-      .center-text{font-size:13px}
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>orcus.wiki</title>
+<style>
+  html,body{
+    margin:0;padding:0;height:100%;
+    font-family:"Inter",sans-serif;
+    background:radial-gradient(ellipse at center,#0a0a12 0%,#000 70%);
+    color:#eee;display:flex;align-items:center;justify-content:center;
+    flex-direction:column;overflow:hidden;
+  }
+  h1{font-size:4rem;margin:0;color:#fff;text-shadow:0 0 20px #6600ff80;}
+  p{opacity:0.7;}
+  button{
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.2);
+    color:#fff;font-size:1rem;
+    padding:10px 20px;margin:8px;border-radius:10px;
+    cursor:pointer;backdrop-filter:blur(6px);
+    transition:all 0.2s ease;
+  }
+  button:hover{background:rgba(255,255,255,0.2);}
+  #time{font-size:5rem;margin:1rem 0;font-weight:700;letter-spacing:2px;}
+  #msg{position:absolute;bottom:20px;opacity:0.5;font-size:0.9rem;text-align:center;}
+  .fadeout{animation:fadeout 3s forwards;}
+  @keyframes fadeout{to{opacity:0;filter:blur(8px);}}
+  #overlay{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    background:#000;color:#fff;font-size:1.5rem;opacity:0;pointer-events:none;
+    transition:opacity 2s;
+  }
+  #overlay.show{opacity:1;pointer-events:auto;}
+</style>
 </head>
 <body>
-  <div id="app">
-    <!-- actual visible canvas -->
-    <canvas id="out"></canvas>
-
-    <!-- Hidden video and mask canvases -->
-    <video id="video" playsinline style="display:none;"></video>
-    <canvas id="mask" width="640" height="480" style="display:none;"></canvas>
-
-    <div class="ui" id="controls">
-      <button id="startBtn">Start</button>
-      <button id="effectVoid" class="active">Void</button>
-      <button id="effectGlitch">Glitch</button>
-      <button id="effectBlur">Blur</button>
-      <div class="small">Model: <span id="modelStatus">idle</span></div>
-    </div>
-
-    <div class="center-text" id="ctext">
-      MirrorWithoutYou — allow camera. Your silhouette will be removed and replaced by a void.<br>
-      <span style="font-size:12px;opacity:0.8">This runs locally in your browser. No video leaves your device.</span>
-    </div>
-
-    <div class="notice" id="notice" style="display:none;"></div>
+  <h1>BorrowTime.org</h1>
+  <div id="time">--:--</div>
+  <div>
+    <button id="give">Give 1 min</button>
+    <button id="borrow">Borrow 1 min</button>
   </div>
+  <p id="global"></p>
+  <p id="msg">Every minute you take must come from someone else.</p>
+  <div id="overlay">You borrowed too much time.</div>
 
-  <!-- TensorFlow.js & BodyPix -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0.5/dist/body-pix.min.js"></script>
+<script>
+(function(){
+  const display = document.getElementById("time");
+  const globalText = document.getElementById("global");
+  const overlay = document.getElementById("overlay");
+  const giveBtn = document.getElementById("give");
+  const borrowBtn = document.getElementById("borrow");
+  let myTime = parseInt(localStorage.getItem("myTime")||"60");
+  let globalTime = parseInt(localStorage.getItem("globalTime")||"10000"); // pretend global pool
+  let ticking = false;
 
-  <script>
-    // Single-file MirrorWithoutYou implementation
-    (async function(){
-      const video = document.getElementById('video');
-      const outCanvas = document.getElementById('out');
-      const outCtx = outCanvas.getContext('2d', { alpha: false });
-      const maskCanvas = document.getElementById('mask');
-      const maskCtx = maskCanvas.getContext('2d');
-      const startBtn = document.getElementById('startBtn');
-      const notice = document.getElementById('notice');
-      const modelStatus = document.getElementById('modelStatus');
-      const ctext = document.getElementById('ctext');
+  // format mm:ss
+  function fmt(t){const m=Math.floor(t/60),s=t%60;return `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;}
 
-      let net = null;
-      let running = false;
-      let currentEffect = 'void'; // void | glitch | blur
-      const effectButtons = {
-        void: document.getElementById('effectVoid'),
-        glitch: document.getElementById('effectGlitch'),
-        blur: document.getElementById('effectBlur')
-      };
+  function render(){
+    display.textContent = fmt(myTime);
+    globalText.textContent = "Global pool: "+fmt(globalTime);
+  }
 
-      // UI helpers
-      function showNotice(msg, timeout=5000){
-        notice.style.display = 'flex';
-        notice.textContent = msg;
-        if(timeout) setTimeout(()=> notice.style.display='none', timeout);
-      }
-      function setModelStatus(s){ modelStatus.textContent = s; }
+  function tick(){
+    if(myTime<=0){die();return;}
+    myTime--; save(); render();
+  }
 
-      // choose model options for BodyPix (balanced perf/quality)
-      const bodyPixOptions = {
-        architecture: 'MobileNetV1',
-        outputStride: 16,
-        multiplier: 0.75,
-        quantBytes: 2
-      };
+  function save(){
+    localStorage.setItem("myTime",myTime);
+    localStorage.setItem("globalTime",globalTime);
+  }
 
-      // segmentation options
-      const segmentationOptions = {
-        internalResolution: 'medium',
-        segmentationThreshold: 0.7,
-        maxDetections: 1,
-        scoreThreshold: 0.3,
-        nmsRadius: 20
-      };
+  function die(){
+    overlay.classList.add("show");
+    clearInterval(timer);
+    localStorage.setItem("myTime",0);
+  }
 
-      // Handle effect button toggles
-      Object.entries(effectButtons).forEach(([key, btn])=>{
-        btn.addEventListener('click', ()=> {
-          currentEffect = key;
-          Object.values(effectButtons).forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-        });
-      });
+  // actions
+  giveBtn.onclick = ()=>{
+    if(myTime>1){
+      myTime--;globalTime++;
+      save();render();
+    }else{
+      alert("You can't give what you don't have.");
+    }
+  };
+  borrowBtn.onclick = ()=>{
+    if(globalTime>0){
+      myTime++;globalTime--;
+      save();render();
+    }else{
+      alert("There's no time left to borrow.");
+    }
+  };
 
-      // Start / Stop
-      startBtn.addEventListener('click', async ()=>{
-        if (running) {
-          stop();
-          startBtn.textContent = 'Start';
-          ctext.style.display = 'block';
-          return;
-        }
-        startBtn.disabled = true;
-        await start();
-        startBtn.disabled = false;
-      });
+  // start timer
+  let timer = setInterval(tick,1000);
+  render();
 
-      // Setup camera
-      async function setupCamera() {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: {
-              facingMode: 'user',
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
-            }
-          });
-          video.srcObject = stream;
-          await video.play();
-          return true;
-        } catch (e) {
-          console.warn('Camera error', e);
-          showNotice('Camera access denied or not available. Use a device with a camera and allow access.', 8000);
-          return false;
-        }
-      }
+  // faint ticking sound (optional, minimal)
+  const ctx = new (window.AudioContext||window.webkitAudioContext)();
+  function tickSound(){
+    if(!ticking)return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain).connect(ctx.destination);
+    osc.frequency.value=1000;gain.gain.setValueAtTime(0.05,ctx.currentTime);
+    osc.start();osc.stop(ctx.currentTime+0.05);
+  }
+  document.body.addEventListener("click",()=>{ctx.resume();ticking=!ticking;}, {once:true});
 
-      // Load BodyPix model
-      async function loadModel(){
-        try{
-          setModelStatus('loading...');
-          net = await bodyPix.load(bodyPixOptions);
-          setModelStatus('ready');
-        } catch(e){
-          console.error('Model load error', e);
-          setModelStatus('error');
-          showNotice('Could not load segmentation model. Check your connection or try again later.', 8000);
-        }
-      }
-
-      // resize canvases to match viewport/resolution
-      function resizeToDisplay() {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        // make canvas resolution slightly larger for quality, but keep ratio
-        outCanvas.width = Math.min(1280, Math.max(640, Math.floor(w * devicePixelRatio)));
-        outCanvas.height = Math.min(720, Math.max(480, Math.floor(h * devicePixelRatio)));
-        // mask canvas should match video resolution
-        const vW = video.videoWidth || 640;
-        const vH = video.videoHeight || 480;
-        maskCanvas.width = vW;
-        maskCanvas.height = vH;
-      }
-
-      // Animated void background (noise + radial)
-      const voidBg = {
-        t: 0,
-        draw(ctx, w, h) {
-          // gradient base
-          const g = ctx.createLinearGradient(0, 0, w, h);
-          g.addColorStop(0, '#06060a');
-          g.addColorStop(0.5, '#06090f');
-          g.addColorStop(1, '#020204');
-          ctx.fillStyle = g;
-          ctx.fillRect(0,0,w,h);
-          // animated noise (fast low-opacity rectangles)
-          const density = Math.min(0.0008 * w * h, 1500);
-          ctx.globalAlpha = 0.06;
-          for(let i=0;i<density/80;i++){
-            const x = Math.random()*w;
-            const y = Math.random()*h;
-            const size = 1 + Math.random()*2;
-            ctx.fillRect(x,y,size,size);
-          }
-          ctx.globalAlpha = 1;
-          // subtle vignette
-          const rg = ctx.createRadialGradient(w/2, h/2, Math.min(w,h)/6, w/2, h/2, Math.max(w,h)/1.2);
-          rg.addColorStop(0, 'rgba(0,0,0,0)');
-          rg.addColorStop(1, 'rgba(0,0,0,0.55)');
-          ctx.fillStyle = rg;
-          ctx.fillRect(0,0,w,h);
-        }
-      };
-
-      // draw glitch pattern (overlay for glitch effect)
-      function drawGlitchOverlay(ctx, w, h) {
-        const bandCount = 6;
-        ctx.save();
-        ctx.globalAlpha = 0.12;
-        for (let i=0;i<bandCount;i++){
-          const y = (h / bandCount) * i + (Math.sin(perfNow()/200 + i) * 8);
-          const hh = 2 + Math.random()*12;
-          ctx.fillRect(0, y + Math.random()*6, w * (0.4 + Math.random()*0.6), hh);
-        }
-        ctx.restore();
-      }
-
-      // utility perf time
-      function perfNow(){ return (performance && performance.now && performance.now()) || Date.now(); }
-
-      // main loop: draw background, video, erase person
-      async function renderLoop(){
-        if(!running) return;
-        if(video.readyState < 2){ requestAnimationFrame(renderLoop); return; }
-
-        resizeToDisplay();
-
-        const w = outCanvas.width;
-        const h = outCanvas.height;
-
-        // scale factors: we want to draw video at canvas size but mask is at video size
-        // draw void background first
-        voidBg.t += 1;
-        voidBg.draw(outCtx, w, h);
-
-        // draw video scaled to canvas (cover)
-        // compute cover transform
-        const vw = video.videoWidth;
-        const vh = video.videoHeight;
-        const scale = Math.max(w/vw, h/vh);
-        const sw = vw * scale;
-        const sh = vh * scale;
-        const sx = (w - sw) / 2;
-        const sy = (h - sh) / 2;
-        outCtx.drawImage(video, 0, 0, vw, vh, sx, sy, sw, sh);
-
-        // segmentation - run at limited frequency for perf
-        let segmentation = null;
-        try {
-          segmentation = await net.segmentPerson(video, segmentationOptions);
-        } catch (e) {
-          console.warn('segment error', e);
-        }
-
-        if(segmentation){
-          // create mask image (person = opaque, background = transparent)
-          const maskWidth = segmentation.width;
-          const maskHeight = segmentation.height;
-          const maskImage = maskCtx.createImageData(maskWidth, maskHeight);
-          const data = maskImage.data;
-          const segData = segmentation.data;
-          for(let i=0;i<segData.length;i++){
-            const offset = i * 4;
-            if(segData[i] === 1){ // person pixel
-              data[offset] = 255;
-              data[offset+1] = 255;
-              data[offset+2] = 255;
-              data[offset+3] = 255; // opaque white
-            } else {
-              data[offset+0] = 0;
-              data[offset+1] = 0;
-              data[offset+2] = 0;
-              data[offset+3] = 0; // transparent
-            }
-          }
-          maskCtx.putImageData(maskImage, 0, 0);
-
-          // Draw mask onto outCanvas using composite operation to *erase* person
-          outCtx.save();
-          // scale mask canvas to the same transform we used to draw video (cover)
-          outCtx.globalCompositeOperation = 'destination-out';
-          outCtx.drawImage(maskCanvas, 0, 0, maskCanvas.width, maskCanvas.height, sx, sy, sw, sh);
-          outCtx.restore();
-
-          // Now apply effect overlays to the empty (cutout) areas as desired
-          if(currentEffect === 'glitch'){
-            // small color bands and random offsets
-            outCtx.save();
-            outCtx.globalCompositeOperation = 'source-over';
-            outCtx.globalAlpha = 0.55;
-            drawGlitchOverlay(outCtx, w, h);
-            outCtx.restore();
-          } else if(currentEffect === 'blur'){
-            // a faux blur: draw the void again slightly offset and low alpha to simulate softness
-            outCtx.save();
-            outCtx.globalCompositeOperation = 'source-over';
-            outCtx.globalAlpha = 0.14;
-            for(let i=0;i<6;i++){
-              outCtx.fillRect(0,0,0,0); // no-op but keep
-            }
-            outCtx.restore();
-            // add faint radial highlight
-            outCtx.save();
-            const rg = outCtx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w,h)/2);
-            rg.addColorStop(0, 'rgba(255,255,255,0.02)');
-            rg.addColorStop(1, 'rgba(0,0,0,0)');
-            outCtx.fillStyle = rg;
-            outCtx.fillRect(0,0,w,h);
-            outCtx.restore();
-          } else {
-            // void: maybe a subtle vignette already applied by voidBg.
-            // draw faint drifting lines to give depth
-            outCtx.save();
-            outCtx.globalAlpha = 0.06;
-            for(let i=0;i<3;i++){
-              outCtx.beginPath();
-              outCtx.moveTo(0, (h/3)*i + Math.sin(perfNow()/1000 + i)*15);
-              outCtx.lineTo(w, (h/3)*i + Math.cos(perfNow()/900 + i)*15);
-              outCtx.lineWidth = 1.5;
-              outCtx.strokeStyle = 'rgba(255,255,255,0.06)';
-              outCtx.stroke();
-            }
-            outCtx.restore();
-          }
-        }
-
-        // redraw center message less after start
-        ctext.style.opacity = running ? 0.0 : 1.0;
-
-        // schedule next frame
-        requestAnimationFrame(renderLoop);
-      }
-
-      // Start everything
-      async function start(){
-        ctext.style.display = 'none';
-        if(!await setupCamera()) { return; }
-        resizeToDisplay();
-
-        if(!net){
-          await loadModel();
-        }
-
-        // small warmup: run one segmentation
-        setModelStatus('warming up');
-        try{
-          await net.segmentPerson(video, segmentationOptions);
-          setModelStatus('ready');
-        }catch(e){
-          console.warn('warmup error', e);
-        }
-
-        running = true;
-        startBtn.textContent = 'Stop';
-        showNotice('Running — your silhouette will be removed locally in the browser.', 3000);
-        renderLoop();
-      }
-
-      // Stop capturing
-      function stop(){
-        running = false;
-        // stop camera tracks
-        const stream = video.srcObject;
-        if(stream){
-          const tracks = stream.getTracks();
-          tracks.forEach(t => t.stop());
-          video.srcObject = null;
-        }
-        startBtn.textContent = 'Start';
-        ctext.style.display = 'block';
-      }
-
-      // auto-load model in background to reduce start delay
-      loadModel();
-
-      // small helpful text when page first loaded
-      showNotice('Tip: allow camera access and click Start. Runs locally — no upload.', 5000);
-
-      // handle resize
-      window.addEventListener('resize', ()=> { if(video.readyState >=2) resizeToDisplay(); });
-
-    })();
-  </script>
+})();
+</script>
 </body>
 </html>
