@@ -1,139 +1,297 @@
-<!DOCTYPE html>
+/*
+Single-file Node.js app: Science Facts Scraper + Minimal Frontend
+Inspired (visually) by MIT Technology Review — clean two-column layout, large masthead, card-based facts.
+
+Usage:
+1. Install dependencies: npm install express axios cheerio
+2. Run: node science-facts-single-file.js
+3. Open http://localhost:3000
+
+Notes & disclaimers:
+- This example shows how to scrape a few public science news sites. Respect each site's Terms of Service and robots.txt.
+- For production use, add caching, error handling, rate-limiting, and obey robots.txt. Consider using official APIs or RSS feeds instead of scraping.
+*/
+
+const express = require('express');
+const axios = require('axios');
+const cheerio = require('cheerio');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.static('.'));
+
+// --- Simple scrapers for a couple of science news sites. Each returns an array of fact objects: {title,text,image,source,sourceUrl}
+async function scrapePhysOrg(query) {
+  // Phys.org search URL (simple query param)
+  const searchUrl = `https://phys.org/tags/${encodeURIComponent(query)}/`;
+  try {
+    const res = await axios.get(searchUrl, { headers: { 'User-Agent': 'Science-Facts-Bot/1.0 (+https://example.com)' } });
+    const $ = cheerio.load(res.data);
+    const articles = [];
+    $('.sorted-article').slice(0, 6).each((i, el) => {
+      const anchor = $(el).find('a.title');
+      const title = anchor.text().trim();
+      const url = anchor.attr('href');
+      const summary = $(el).find('.sorted-article__summary').text().trim() || '';
+      const img = $(el).find('img').attr('data-src') || $(el).find('img').attr('src') || null;
+      if (title && url) {
+        articles.push({ title, text: summary || title, image: img, source: 'Phys.org', sourceUrl: url });
+      }
+    });
+    return articles;
+  } catch (e) {
+    return [];
+  }
+}
+
+async function scrapeScienceDaily(query) {
+  const searchUrl = `https://www.sciencedaily.com/search/?keyword=${encodeURIComponent(query)}`;
+  try {
+    const res = await axios.get(searchUrl, { headers: { 'User-Agent': 'Science-Facts-Bot/1.0 (+https://example.com)' } });
+    const $ = cheerio.load(res.data);
+    const items = [];
+    $('.search-results .latest').slice(0, 6).each((i, el) => {
+      const anchor = $(el).find('h3 a');
+      const title = anchor.text().trim();
+      const url = 'https://www.sciencedaily.com' + anchor.attr('href');
+      const summary = $(el).find('.summary').text().trim();
+      const img = $(el).find('img').attr('data-src') || $(el).find('img').attr('src') || null;
+      items.push({ title, text: summary || title, image: img, source: 'ScienceDaily', sourceUrl: url });
+    });
+    return items;
+  } catch (e) {
+    return [];
+  }
+}
+
+async function scrapeNatureLatest() {
+  const url = 'https://www.nature.com/subjects';
+  try {
+    const res = await axios.get('https://www.nature.com', { headers: { 'User-Agent': 'Science-Facts-Bot/1.0 (+https://example.com)' } });
+    const $ = cheerio.load(res.data);
+    const items = [];
+    $('article').slice(0, 6).each((i, el) => {
+      const anchor = $(el).find('a[href]');
+      const title = $(el).find('h3').text().trim() || anchor.text().trim();
+      const href = anchor.attr('href');
+      const url = href && href.startsWith('http') ? href : (href ? 'https://www.nature.com' + href : null);
+      const summary = $(el).find('p').text().trim();
+      const img = $(el).find('img').attr('src') || null;
+      if (title && url) items.push({ title, text: summary || title, image: img, source: 'Nature', sourceUrl: url });
+    });
+    return items;
+  } catch (e) {
+    return [];
+  }
+}
+
+// Generic fetch-from-url that attempts to extract main title, first paragraph and first image
+async function scrapeGeneric(url) {
+  try {
+    const res = await axios.get(url, { headers: { 'User-Agent': 'Science-Facts-Bot/1.0 (+https://example.com)' } });
+    const $ = cheerio.load(res.data);
+    const title = $('meta[property="og:title"]').attr('content') || $('title').text() || $('h1').first().text();
+    let paragraph = $('meta[name="description"]').attr('content') || $('p').first().text();
+    paragraph = paragraph && paragraph.trim();
+    const img = $('meta[property="og:image"]').attr('content') || $('img').first().attr('src') || null;
+    return { title: title ? title.trim() : null, text: paragraph || null, image: img, source: (new URL(url)).host, sourceUrl: url };
+  } catch (e) {
+    return null;
+  }
+}
+
+// API endpoint: search by query across multiple sites
+app.get('/api/search', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q) return res.json({ ok: false, error: 'no query' });
+  // run scrapers in parallel
+  const results = await Promise.all([scrapePhysOrg(q), scrapeScienceDaily(q), scrapeNatureLatest()]);
+  // flatten & normalize
+  const flat = results.flat().map(r => ({
+    title: r.title,
+    text: r.text ? summarizeText(r.text) : '',
+    image: r.image ? makeAbsolute(r.image, r.sourceUrl) : null,
+    source: r.source,
+    sourceUrl: absoluteUrl(r.sourceUrl)
+  }));
+  res.json({ ok: true, items: flat });
+});
+
+// API endpoint: fetch single url and extract fact
+app.get('/api/fetch', async (req, res) => {
+  const url = req.query.url;
+  if (!url) return res.json({ ok: false, error: 'no url' });
+  const fact = await scrapeGeneric(url);
+  if (!fact) return res.json({ ok: false, error: 'could not fetch' });
+  // shorten text
+  fact.text = summarizeText(fact.text || fact.title || '');
+  fact.image = fact.image ? makeAbsolute(fact.image, url) : null;
+  fact.source = (new URL(url)).host;
+  res.json({ ok: true, fact });
+});
+
+// small utility: create absolute url from possibly relative src
+function makeAbsolute(src, base) {
+  try {
+    if (!src) return null;
+    if (src.startsWith('http')) return src;
+    if (src.startsWith('//')) return 'https:' + src;
+    if (!base) return src;
+    return new URL(src, base).href;
+  } catch (e) {
+    return src; // best-effort
+  }
+}
+
+function absoluteUrl(u) {
+  try { return new URL(u).href; } catch (e) { return u; }
+}
+
+function summarizeText(text, max = 140) {
+  if (!text) return '';
+  const clean = text.replace(/\s+/g, ' ').trim();
+  if (clean.length <= max) return clean;
+  // cut to nearest sentence or word
+  let truncated = clean.slice(0, max);
+  const lastPeriod = truncated.lastIndexOf('.');
+  if (lastPeriod > Math.floor(max * 0.6)) truncated = truncated.slice(0, lastPeriod + 1);
+  return truncated.trim() + '…';
+}
+
+// Serve single-page app
+app.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(`<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>You Are Being Observed</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>orcus - Science Snippets</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: black;
-    color: #00ff88;
-    font-family: "Courier New", monospace;
-    overflow: hidden;
-  }
-  #video {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover;
-    opacity: 0.15;
-    filter: grayscale(100%) contrast(1.5);
-  }
-  #overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 2;
-  }
-  #terminal {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    width: 95%;
-    max-height: 90%;
-    overflow-y: auto;
-    white-space: pre-wrap;
-    z-index: 3;
-  }
-  .blink {
-    animation: blink 1s step-start infinite;
-  }
-  @keyframes blink {
-    50% { opacity: 0; }
-  }
-  .scan-line {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 2px;
-    background: rgba(0,255,0,0.3);
-    animation: scan 3s linear infinite;
-  }
-  @keyframes scan {
-    0% { top: 0; }
-    100% { top: 100%; }
-  }
+  :root{--accent:#c21807;--muted:#6b6b6b;--max-width:1100px}
+  body{font-family:Roboto,system-ui,Arial;line-height:1.45;color:#111;margin:0;background:#fafafa}
+  .container{max-width:var(--max-width);margin:30px auto;padding:20px}
+  header{display:flex;align-items:center;gap:18px}
+  .mast{font-family:Merriweather,serif;font-size:34px;color:#111}
+  .tagline{color:var(--muted);font-size:14px}
+  .search{margin-left:auto}
+  .search input{padding:10px 12px;border-radius:6px;border:1px solid #ddd;width:320px}
+  main{display:grid;grid-template-columns:1fr 360px;gap:28px;margin-top:20px}
+  .feed{background:white;padding:18px;border-radius:8px;box-shadow:0 6px 20px rgba(30,30,30,0.04)}
+  .card{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid #eee}
+  .card:last-child{border-bottom:none}
+  .thumb{width:110px;height:72px;flex:0 0 110px;border-radius:6px;overflow:hidden;background:#ddd}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .meta h3{margin:0;font-size:16px}
+  .meta p{margin:6px 0 0;color:var(--muted);font-size:13px}
+  .source{font-size:12px;color:var(--muted);margin-top:6px}
+  aside .panel{background:white;padding:14px;border-radius:8px;box-shadow:0 6px 20px rgba(30,30,30,0.04)}
+  .btn{display:inline-block;padding:8px 12px;border-radius:6px;text-decoration:none;background:var(--accent);color:white}
+  footer{color:var(--muted);text-align:center;margin-top:26px;font-size:13px}
+  .small{font-size:12px;color:var(--muted)}
+  a.source-link{color:var(--accent);text-decoration:none}
+  /* Responsive */
+  @media (max-width:880px){main{grid-template-columns:1fr} .search input{width:180px}}
 </style>
 </head>
 <body>
-<video id="video" autoplay playsinline></video>
-<canvas id="overlay"></canvas>
-<div class="scan-line"></div>
-<div id="terminal"></div>
+  <div class="container">
+    <header>
+      <div>
+        <div class="mast">Science Snippets</div>
+        <div class="tagline">Short science facts, bite-sized and sourced — built for curious minds</div>
+      </div>
+      <div class="search">
+        <input id="q" placeholder="Search topic (eg: astronomy, AI, climate)" />
+        <button id="searchBtn" class="btn" style="margin-left:8px">Search</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="feed" id="feed">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <strong>Latest snippets</strong>
+          <div class="small" id="status">Enter a topic and press Search</div>
+        </div>
+        <div id="items"></div>
+      </section>
+
+      <aside>
+        <div class="panel">
+          <h4 style="margin:0 0 8px 0">How this works</h4>
+          <p class="small">This demo fetches recent science articles from public news sites, extracts a short text snippet and an image (if available). Click "Read source" on any card to open the original article.</p>
+          <p class="small">For production, use official APIs or RSS feeds and respect robots.txt.</p>
+        </div>
+        <div style="height:16px"></div>
+        <div class="panel">
+          <h4 style="margin:0 0 8px 0">Quick topics</h4>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <a class="small" href="#" onclick="quick('astronomy')">Astronomy</a>
+            <a class="small" href="#" onclick="quick('ai')">AI</a>
+            <a class="small" href="#" onclick="quick('climate')">Climate</a>
+            <a class="small" href="#" onclick="quick('neuroscience')">Neuroscience</a>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      Built as a single-file demo • Click a card's "Read source" to view the original article
+    </footer>
+  </div>
 
 <script>
-const video = document.getElementById('video');
-const overlay = document.getElementById('overlay');
-const ctx = overlay.getContext('2d');
-const terminal = document.getElementById('terminal');
-overlay.width = window.innerWidth;
-overlay.height = window.innerHeight;
+  const itemsEl = document.getElementById('items');
+  const statusEl = document.getElementById('status');
+  document.getElementById('searchBtn').addEventListener('click', doSearch);
+  document.getElementById('q').addEventListener('keypress', (e)=>{ if(e.key==='Enter') doSearch(); });
 
-// Fake "Recording" indicator
-let recordEl = document.createElement('div');
-recordEl.textContent = "● Recording...";
-recordEl.style.position = 'fixed';
-recordEl.style.top = '10px';
-recordEl.style.right = '20px';
-recordEl.style.color = 'red';
-recordEl.style.fontSize = '1.2em';
-recordEl.classList.add('blink');
-recordEl.style.zIndex = 5;
-document.body.appendChild(recordEl);
+  function quick(topic){ document.getElementById('q').value = topic; doSearch(); }
 
-// Access camera (no storage)
-navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-.then(stream => { video.srcObject = stream; })
-.catch(err => { terminal.textContent = "Camera access denied.\nSystem unable to proceed."; });
-
-// Fake terminal log
-const lines = [
-  "Initializing visual feed...",
-  "Analyzing subject facial features...",
-  "Mapping emotional pattern...",
-  "Tracking cursor movement...",
-  "Cross-referencing social data...",
-  "Subject located: 127.0.0.1",
-  "Collecting behavioral metrics...",
-  "Confidence level: 98.7%",
-  "Analyzing intent...",
-  "Generating psychological profile...",
-  "Status: UNDER OBSERVATION.",
-  "Further activity will be logged."
-];
-let index = 0;
-
-function printNextLine() {
-  if (index < lines.length) {
-    terminal.textContent += lines[index] + "\n";
-    terminal.scrollTop = terminal.scrollHeight;
-    index++;
-    setTimeout(printNextLine, 1500 + Math.random()*800);
+  async function doSearch(){
+    const q = document.getElementById('q').value.trim();
+    if(!q) return alert('Please enter a topic');
+    setStatus('Searching for "'+q+'"...');
+    itemsEl.innerHTML = '';
+    try{
+      const res = await fetch('/api/search?q=' + encodeURIComponent(q));
+      const json = await res.json();
+      if(!json.ok) { setStatus('No results'); return; }
+      renderItems(json.items);
+      setStatus('Showing ' + json.items.length + ' items');
+    }catch(e){ setStatus('Error fetching results'); }
   }
-}
-printNextLine();
 
-// Cursor tracking visualization
-document.addEventListener('mousemove', (e) => {
-  ctx.clearRect(0, 0, overlay.width, overlay.height);
-  ctx.strokeStyle = '#00ff88';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.arc(e.clientX, e.clientY, 30, 0, 2*Math.PI);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(e.clientX - 15, e.clientY);
-  ctx.lineTo(e.clientX + 15, e.clientY);
-  ctx.moveTo(e.clientX, e.clientY - 15);
-  ctx.lineTo(e.clientX, e.clientY + 15);
-  ctx.stroke();
-});
+  function setStatus(t){ statusEl.textContent = t; }
+
+  function renderItems(items){
+    if(!items || items.length===0){ itemsEl.innerHTML = '<p class="small">No snippets found.</p>'; return; }
+    itemsEl.innerHTML = '';
+    items.forEach(it => {
+      const card = document.createElement('div'); card.className='card';
+      const thumb = document.createElement('div'); thumb.className='thumb';
+      if(it.image){ const img = document.createElement('img'); img.src = it.image; img.alt = it.title || '' ; thumb.appendChild(img); }
+      const meta = document.createElement('div'); meta.className='meta';
+      const h3 = document.createElement('h3'); h3.textContent = it.title || 'Untitled';
+      const p = document.createElement('p'); p.textContent = it.text || '';
+      const src = document.createElement('div'); src.className='source';
+      src.innerHTML = '<span class="small">' + (it.source || '') + '</span> &nbsp; <a class="source-link" target="_blank" href="#" onclick="openSource(\'' + encodeURIComponent(it.sourceUrl || '') + '\')">Read source</a>';
+      meta.appendChild(h3); meta.appendChild(p); meta.appendChild(src);
+      card.appendChild(thumb); card.appendChild(meta);
+      itemsEl.appendChild(card);
+    });
+  }
+
+  function openSource(encoded){
+    const url = decodeURIComponent(encoded);
+    // open in new tab
+    window.open(url, '_blank');
+  }
 </script>
 </body>
-</html>
+</html>`);
+});
 
+app.listen(PORT, () => console.log(`Science Snippets running at http://localhost:${PORT}`));
