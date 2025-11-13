@@ -1,121 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>orcus.wiki</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>You Are Being Observed</title>
 <style>
-  html,body{
-    margin:0;padding:0;height:100%;
-    font-family:"Inter",sans-serif;
-    background:radial-gradient(ellipse at center,#0a0a12 0%,#000 70%);
-    color:#eee;display:flex;align-items:center;justify-content:center;
-    flex-direction:column;overflow:hidden;
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: black;
+    color: #00ff88;
+    font-family: "Courier New", monospace;
+    overflow: hidden;
   }
-  h1{font-size:4rem;margin:0;color:#fff;text-shadow:0 0 20px #6600ff80;}
-  p{opacity:0.7;}
-  button{
-    background:rgba(255,255,255,0.1);
-    border:1px solid rgba(255,255,255,0.2);
-    color:#fff;font-size:1rem;
-    padding:10px 20px;margin:8px;border-radius:10px;
-    cursor:pointer;backdrop-filter:blur(6px);
-    transition:all 0.2s ease;
+  #video {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    opacity: 0.15;
+    filter: grayscale(100%) contrast(1.5);
   }
-  button:hover{background:rgba(255,255,255,0.2);}
-  #time{font-size:5rem;margin:1rem 0;font-weight:700;letter-spacing:2px;}
-  #msg{position:absolute;bottom:20px;opacity:0.5;font-size:0.9rem;text-align:center;}
-  .fadeout{animation:fadeout 3s forwards;}
-  @keyframes fadeout{to{opacity:0;filter:blur(8px);}}
-  #overlay{
-    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-    background:#000;color:#fff;font-size:1.5rem;opacity:0;pointer-events:none;
-    transition:opacity 2s;
+  #overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 2;
   }
-  #overlay.show{opacity:1;pointer-events:auto;}
+  #terminal {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    width: 95%;
+    max-height: 90%;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    z-index: 3;
+  }
+  .blink {
+    animation: blink 1s step-start infinite;
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  .scan-line {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(0,255,0,0.3);
+    animation: scan 3s linear infinite;
+  }
+  @keyframes scan {
+    0% { top: 0; }
+    100% { top: 100%; }
+  }
 </style>
 </head>
 <body>
-  <h1>BorrowTime.org</h1>
-  <div id="time">--:--</div>
-  <div>
-    <button id="give">Give 1 min</button>
-    <button id="borrow">Borrow 1 min</button>
-  </div>
-  <p id="global"></p>
-  <p id="msg">Every minute you take must come from someone else.</p>
-  <div id="overlay">You borrowed too much time.</div>
+<video id="video" autoplay playsinline></video>
+<canvas id="overlay"></canvas>
+<div class="scan-line"></div>
+<div id="terminal"></div>
 
 <script>
-(function(){
-  const display = document.getElementById("time");
-  const globalText = document.getElementById("global");
-  const overlay = document.getElementById("overlay");
-  const giveBtn = document.getElementById("give");
-  const borrowBtn = document.getElementById("borrow");
-  let myTime = parseInt(localStorage.getItem("myTime")||"60");
-  let globalTime = parseInt(localStorage.getItem("globalTime")||"10000"); // pretend global pool
-  let ticking = false;
+const video = document.getElementById('video');
+const overlay = document.getElementById('overlay');
+const ctx = overlay.getContext('2d');
+const terminal = document.getElementById('terminal');
+overlay.width = window.innerWidth;
+overlay.height = window.innerHeight;
 
-  // format mm:ss
-  function fmt(t){const m=Math.floor(t/60),s=t%60;return `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;}
+// Fake "Recording" indicator
+let recordEl = document.createElement('div');
+recordEl.textContent = "● Recording...";
+recordEl.style.position = 'fixed';
+recordEl.style.top = '10px';
+recordEl.style.right = '20px';
+recordEl.style.color = 'red';
+recordEl.style.fontSize = '1.2em';
+recordEl.classList.add('blink');
+recordEl.style.zIndex = 5;
+document.body.appendChild(recordEl);
 
-  function render(){
-    display.textContent = fmt(myTime);
-    globalText.textContent = "Global pool: "+fmt(globalTime);
+// Access camera (no storage)
+navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+.then(stream => { video.srcObject = stream; })
+.catch(err => { terminal.textContent = "Camera access denied.\nSystem unable to proceed."; });
+
+// Fake terminal log
+const lines = [
+  "Initializing visual feed...",
+  "Analyzing subject facial features...",
+  "Mapping emotional pattern...",
+  "Tracking cursor movement...",
+  "Cross-referencing social data...",
+  "Subject located: 127.0.0.1",
+  "Collecting behavioral metrics...",
+  "Confidence level: 98.7%",
+  "Analyzing intent...",
+  "Generating psychological profile...",
+  "Status: UNDER OBSERVATION.",
+  "Further activity will be logged."
+];
+let index = 0;
+
+function printNextLine() {
+  if (index < lines.length) {
+    terminal.textContent += lines[index] + "\n";
+    terminal.scrollTop = terminal.scrollHeight;
+    index++;
+    setTimeout(printNextLine, 1500 + Math.random()*800);
   }
+}
+printNextLine();
 
-  function tick(){
-    if(myTime<=0){die();return;}
-    myTime--; save(); render();
-  }
-
-  function save(){
-    localStorage.setItem("myTime",myTime);
-    localStorage.setItem("globalTime",globalTime);
-  }
-
-  function die(){
-    overlay.classList.add("show");
-    clearInterval(timer);
-    localStorage.setItem("myTime",0);
-  }
-
-  // actions
-  giveBtn.onclick = ()=>{
-    if(myTime>1){
-      myTime--;globalTime++;
-      save();render();
-    }else{
-      alert("You can't give what you don't have.");
-    }
-  };
-  borrowBtn.onclick = ()=>{
-    if(globalTime>0){
-      myTime++;globalTime--;
-      save();render();
-    }else{
-      alert("There's no time left to borrow.");
-    }
-  };
-
-  // start timer
-  let timer = setInterval(tick,1000);
-  render();
-
-  // faint ticking sound (optional, minimal)
-  const ctx = new (window.AudioContext||window.webkitAudioContext)();
-  function tickSound(){
-    if(!ticking)return;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain).connect(ctx.destination);
-    osc.frequency.value=1000;gain.gain.setValueAtTime(0.05,ctx.currentTime);
-    osc.start();osc.stop(ctx.currentTime+0.05);
-  }
-  document.body.addEventListener("click",()=>{ctx.resume();ticking=!ticking;}, {once:true});
-
-})();
+// Cursor tracking visualization
+document.addEventListener('mousemove', (e) => {
+  ctx.clearRect(0, 0, overlay.width, overlay.height);
+  ctx.strokeStyle = '#00ff88';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(e.clientX, e.clientY, 30, 0, 2*Math.PI);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(e.clientX - 15, e.clientY);
+  ctx.lineTo(e.clientX + 15, e.clientY);
+  ctx.moveTo(e.clientX, e.clientY - 15);
+  ctx.lineTo(e.clientX, e.clientY + 15);
+  ctx.stroke();
+});
 </script>
 </body>
 </html>
+
