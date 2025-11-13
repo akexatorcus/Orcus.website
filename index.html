@@ -1,57 +1,367 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Science Facts Daily</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>orcus — Live Space News & Launches</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
   <style>
-    body { font-family: 'Helvetica Neue', sans-serif; background:#f7f7f7; margin:0; }
-    header { background:black; color:white; padding:20px; text-align:center; font-size:1.5em; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; padding:20px; }
-    .card { background:white; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.1); overflow:hidden; transition:transform .2s; }
-    .card:hover { transform:translateY(-5px); }
-    img { width:100%; height:180px; object-fit:cover; }
-    .content { padding:15px; }
-    a { text-decoration:none; color:#0073e6; }
+    :root{
+      --accent:#c21807;
+      --muted:#6b6b6b;
+      --max-width:1200px;
+      --card-radius:12px;
+      --bg:#fbfbfb;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial; background:var(--bg); color:#111;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* Header / Mast */
+    header{
+      background:linear-gradient(180deg, #fff 60%, #f6f6f6 100%);
+      border-bottom:1px solid #eee;
+      padding:22px 16px;
+      position:sticky; top:0; z-index:30;
+    }
+    .topbar{max-width:var(--max-width); margin:0 auto; display:flex; align-items:center; gap:20px;}
+    .brand{display:flex; flex-direction:column; line-height:1}
+    .brand .title{font-family:Merriweather, serif; font-size:28px; letter-spacing:-0.02em; margin:0; color:#111}
+    .brand .kicker{font-size:12px; color:var(--muted)}
+    nav{margin-left:auto; display:flex; gap:12px; align-items:center}
+    nav a{color:#222; text-decoration:none; font-size:14px; padding:8px 12px; border-radius:8px}
+    nav a.primary{background:var(--accent); color:white}
+
+    /* Layout */
+    .wrap{max-width:var(--max-width); margin:26px auto; padding:0 16px; display:grid; grid-template-columns:1fr 340px; gap:28px;}
+    @media (max-width:980px){ .wrap{grid-template-columns:1fr} nav{display:none} }
+
+    /* Left column feed */
+    .hero{
+      background:linear-gradient(180deg, #ffffff 0%, #fff 100%);
+      border-radius:var(--card-radius); overflow:hidden; box-shadow:0 8px 30px rgba(20,20,20,0.04);
+      margin-bottom:18px;
+    }
+    .hero .media{width:100%; height:420px; background:#ddd; display:flex; align-items:center; justify-content:center; overflow:hidden}
+    .hero img{width:100%; height:100%; object-fit:cover}
+    .hero .meta{padding:18px}
+    .hero .meta h1{margin:0; font-family:Merriweather, serif; font-size:22px}
+    .hero .meta p{margin:8px 0 0; color:var(--muted)}
+
+    .cards{display:flex; flex-direction:column; gap:12px}
+    .card{
+      background:white; border-radius:12px; padding:12px; display:flex; gap:12px; align-items:flex-start;
+      box-shadow:0 6px 18px rgba(20,20,20,0.03);
+    }
+    .card .thumb{width:140px; height:92px; flex:0 0 140px; border-radius:8px; overflow:hidden; background:#eee}
+    .card .thumb img{width:100%; height:100%; object-fit:cover}
+    .card .info h3{margin:0; font-size:16px}
+    .card .info p{margin:8px 0 0;color:var(--muted); font-size:13px}
+    .card .metaSmall{font-size:12px; color:var(--muted); margin-top:8px}
+
+    /* Sidebar */
+    aside .panel{background:white; padding:14px; border-radius:12px; box-shadow:0 6px 20px rgba(20,20,20,0.04); margin-bottom:16px}
+    .launch{display:flex; gap:12px; align-items:center}
+    .launch .when{flex:1}
+    .countdown{font-weight:600; color:var(--accent)}
+
+    /* Footer */
+    footer{text-align:center; color:var(--muted); font-size:13px; padding:40px 0 80px}
+
+    /* Small */
+    .small{font-size:13px; color:var(--muted)}
+    a.source{color:var(--accent); text-decoration:none; font-weight:600}
+    .skeleton{background:linear-gradient(90deg,#eee,#f5f5f5,#eee); background-size:200% 100%; animation:shimmer 1.6s linear infinite}
+    @keyframes shimmer{from{background-position:200% 0} to{background-position:-200% 0}}
   </style>
 </head>
 <body>
-  <header>🔬 Science Facts Daily</header>
-  <div id="facts" class="grid"></div>
 
-  <script>
-    async function loadFacts() {
-      const rssUrls = [
-        "https://www.sciencedaily.com/rss/top/science.xml",
-        "https://www.nasa.gov/rss/dyn/breaking_news.rss"
-      ];
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="title">orcus-NowInSpace</div>
+        <div class="kicker">Live space news, launches & imagery</div>
+      </div>
+      <nav>
+        <a href="#" id="navHome">Home</a>
+        <a href="#" id="navLaunches">Launches</a>
+        <a href="#" id="navNews">News</a>
+        <a class="primary" href="#" id="navSubscribe">Subscribe</a>
+      </nav>
+    </div>
+  </header>
 
-      const container = document.getElementById('facts');
-      container.innerHTML = "Loading science facts...";
+  <main class="wrap">
+    <!-- Left: main feed -->
+    <section id="mainFeed">
+      <div class="hero" id="hero">
+        <div class="media skeleton" id="heroMedia"><!-- APOD image here --></div>
+        <div class="meta" id="heroMeta">
+          <h1 id="heroTitle">Loading featured image...</h1>
+          <p id="heroDesc" class="small">Fetching today's astronomy image.</p>
+        </div>
+      </div>
 
-      const allItems = [];
-      for (const url of rssUrls) {
-        const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`);
-        const data = await res.json();
-        if (data.items) allItems.push(...data.items);
-      }
+      <div style="display:flex; justify-content:space-between; align-items:center; margin:8px 0 12px">
+        <h2 style="margin:0">Latest space news</h2>
+        <div class="small" id="newsMeta">Powered by Spaceflight News API</div>
+      </div>
 
-      container.innerHTML = "";
-      allItems.slice(0, 12).forEach(item => {
-        const div = document.createElement('div');
-        div.className = "card";
-        div.innerHTML = `
-          <img src="${item.enclosure?.link || item.thumbnail || 'https://via.placeholder.com/400x180?text=Science'}" alt="">
-          <div class="content">
-            <h3>${item.title}</h3>
-            <p>${item.description.replace(/<[^>]+>/g, '').slice(0, 120)}...</p>
-            <a href="${item.link}" target="_blank">Read Source →</a>
-          </div>
-        `;
-        container.appendChild(div);
-      });
+      <div class="cards" id="newsCards">
+        <!-- news cards -->
+      </div>
+    </section>
+
+    <!-- Right: sidebar -->
+    <aside>
+      <div class="panel" id="launchPanel">
+        <h3 style="margin:0 0 12px 0">Upcoming Launches</h3>
+        <div id="launchList" class="small">
+          Loading launches...
+        </div>
+      </div>
+
+      <div class="panel" id="issPanel">
+        <h4 style="margin:0 0 8px 0">ISS Right Now</h4>
+        <div id="issInfo" class="small">Loading ISS position…</div>
+      </div>
+
+      <div class="panel">
+        <h4 style="margin:0 0 8px 0">Quick filters</h4>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <button onclick="filterNews('NASA')" class="small">NASA</button>
+          <button onclick="filterNews('SpaceX')" class="small">SpaceX</button>
+          <button onclick="filterNews('Starlink')" class="small">Starlink</button>
+          <button onclick="clearFilter()" class="small">Clear</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    Built with public APIs • Data from NASA, Spaceflight News, TheSpaceDevs & Open-Notify
+  </footer>
+
+<script>
+/*
+ NowInSpace — client-only site script
+ - Fetches APOD from NASA (DEMO_KEY by default)
+ - Fetches latest articles from Spaceflight News API
+ - Fetches upcoming launches from TheSpaceDevs Launch Library
+ - Fetches ISS position from Open Notify
+ - All fetches are done client-side (CORS-friendly public APIs)
+*/
+
+const NASA_API_KEY = 'DEMO_KEY'; // Replace with your API key if you want
+
+// Helper: safe fetch with timeout
+async function safeFetch(url, opts = {}, timeout = 12000) {
+  try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    const res = await fetch(url, {...opts, signal: controller.signal});
+    clearTimeout(id);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
+  } catch (e) {
+    console.warn('fetch error', url, e.message || e);
+    return null;
+  }
+}
+
+/* --- APOD (hero) --- */
+async function loadAPOD() {
+  const heroMedia = document.getElementById('heroMedia');
+  const heroTitle = document.getElementById('heroTitle');
+  const heroDesc = document.getElementById('heroDesc');
+
+  const url = `https://api.nasa.gov/planetary/apod?api_key=${encodeURIComponent(NASA_API_KEY)}`;
+  const data = await safeFetch(url);
+  if (!data) {
+    heroMedia.className = 'media';
+    heroMedia.innerHTML = '<div style="padding:30px"><strong>Could not load image.</strong></div>';
+    heroTitle.textContent = 'Astronomy Picture of the Day';
+    heroDesc.textContent = 'Try again later or add your NASA API key.';
+    return;
+  }
+
+  heroMedia.className = 'media';
+  // if video, show thumbnail if available
+  if (data.media_type === 'video') {
+    // embed link
+    heroMedia.innerHTML = `<iframe src="${data.url}" style="width:100%;height:100%;border:0" title="APOD video" frameborder="0" allowfullscreen></iframe>`;
+  } else {
+    const img = document.createElement('img');
+    img.src = data.url;
+    img.alt = data.title || 'APOD';
+    heroMedia.innerHTML = '';
+    heroMedia.appendChild(img);
+  }
+  heroTitle.textContent = data.title || 'Astronomy Picture';
+  heroDesc.textContent = (data.explanation || '').slice(0, 220) + (data.explanation && data.explanation.length > 220 ? '…' : '');
+}
+
+/* --- Spaceflight News --- */
+let NEWS_ITEMS = []; // keep for filtering
+async function loadNews() {
+  const endpoint = 'https://api.spaceflightnewsapi.net/v3/articles?_limit=12';
+  const data = await safeFetch(endpoint);
+  const container = document.getElementById('newsCards');
+  const meta = document.getElementById('newsMeta');
+  if (!data) {
+    container.innerHTML = '<div class="small">Could not load news. Try again later.</div>';
+    meta.textContent = 'News unavailable';
+    return;
+  }
+  NEWS_ITEMS = data;
+  meta.textContent = `Showing ${data.length} articles — updated ${new Date().toLocaleString()}`;
+  renderNewsCards(data);
+}
+
+function renderNewsCards(items) {
+  const container = document.getElementById('newsCards');
+  container.innerHTML = '';
+  if (!items || items.length === 0) {
+    container.innerHTML = '<div class="small">No articles found.</div>'; return;
+  }
+  items.forEach(it => {
+    const card = document.createElement('article');
+    card.className = 'card';
+    const thumb = document.createElement('div'); thumb.className = 'thumb';
+    const img = document.createElement('img');
+    img.src = it.imageUrl || it.image_url || 'https://via.placeholder.com/300x180?text=Space';
+    img.alt = it.title || 'article';
+    thumb.appendChild(img);
+
+    const info = document.createElement('div'); info.className = 'info';
+    const h3 = document.createElement('h3'); h3.textContent = it.title;
+    const p = document.createElement('p'); p.textContent = (it.summary || it.summary || '').slice(0, 160) + (it.summary && it.summary.length>160 ? '…' : '');
+    const m = document.createElement('div'); m.className = 'metaSmall';
+    const d = new Date(it.publishedAt || it.publishedAt || it.publishedAt || it.published_at || it.publishedAt || it.updated_at || it.publishedAt);
+    m.innerHTML = `<span>${it.newsSite || it.source || ''} · ${isNaN(d)? '': d.toLocaleDateString()}</span> &nbsp; <a class="source" href="${it.url || it.link}" target="_blank" rel="noopener">Read source</a>`;
+
+    info.appendChild(h3); info.appendChild(p); info.appendChild(m);
+
+    card.appendChild(thumb); card.appendChild(info);
+    container.appendChild(card);
+  });
+}
+
+/* --- Launches (TheSpaceDevs) --- */
+let LAUNCHES = [];
+async function loadLaunches() {
+  const endpoint = 'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=8&mode=detailed';
+  const data = await safeFetch(endpoint);
+  const list = document.getElementById('launchList');
+  if (!data || !data.results) {
+    list.innerHTML = '<div class="small">Could not load launches.</div>';
+    return;
+  }
+  LAUNCHES = data.results;
+  renderLaunches(data.results);
+}
+
+function renderLaunches(items) {
+  const list = document.getElementById('launchList');
+  list.innerHTML = '';
+  items.forEach(ln => {
+    const el = document.createElement('div');
+    el.style.marginBottom = '12px';
+    el.className = 'launch';
+
+    const when = document.createElement('div');
+    when.className = 'when';
+    const name = document.createElement('div'); name.textContent = ln.name; name.style.fontWeight = 600;
+    const t = new Date(ln.net);
+    const dt = document.createElement('div'); dt.className = 'small'; dt.textContent = t.toLocaleString();
+
+    const countdown = document.createElement('div'); countdown.className = 'countdown small';
+    countdown.setAttribute('data-net', ln.net);
+    // initial countdown value
+    updateCountdownElement(countdown);
+
+    when.appendChild(name); when.appendChild(dt); when.appendChild(countdown);
+    // agency image if present
+    const logo = document.createElement('div'); logo.style.width='56px'; logo.style.height='56px';
+    if (ln.rocket && ln.image) {
+      const im = document.createElement('img'); im.src = ln.image; im.alt = ln.name; im.style.width='56px'; im.style.height='56px'; im.style.objectFit='cover'; im.style.borderRadius='8px';
+      logo.appendChild(im);
+    } else {
+      logo.innerHTML = '<div style="width:56px;height:56px;border-radius:8px;background:#eee;display:flex;align-items:center;justify-content:center;color:#999">🚀</div>';
     }
-    loadFacts();
-  </script>
+
+    el.appendChild(when); el.appendChild(logo);
+    list.appendChild(el);
+  });
+
+  // start countdown interval
+  if (!window._nowinspace_countdown_tick) {
+    window._nowinspace_countdown_tick = setInterval(()=> {
+      document.querySelectorAll('.countdown').forEach(updateCountdownElement);
+    }, 1000);
+  }
+}
+
+function updateCountdownElement(el) {
+  if (!el) return;
+  const dt = el.getAttribute('data-net');
+  if(!dt) return;
+  const target = new Date(dt);
+  const diff = target - new Date();
+  if (isNaN(diff)) { el.textContent = 'TBA'; return; }
+  if (diff <= 0) { el.textContent = 'Launched'; return; }
+  const s = Math.floor(diff / 1000);
+  const days = Math.floor(s / 86400); const hours = Math.floor((s % 86400) / 3600);
+  const mins = Math.floor((s % 3600) / 60); const secs = s % 60;
+  el.textContent = (days>0? days+'d ':'') + String(hours).padStart(2,'0')+':' + String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+}
+
+/* --- ISS position --- */
+async function loadISS() {
+  const url = 'https://api.wheretheiss.at/v1/satellites/25544'; // wheretheiss.at has CORS and richer info
+  const data = await safeFetch(url);
+  const info = document.getElementById('issInfo');
+  if (!data) {
+    info.textContent = 'Could not fetch ISS position.';
+    return;
+  }
+  function show(d) {
+    info.innerHTML = `Latitude: ${d.latitude.toFixed(2)}°, Longitude: ${d.longitude.toFixed(2)}° <br> Alt: ${d.altitude ? d.altitude.toFixed(1)+' km' : '—'} • Vel: ${d.velocity ? d.velocity.toFixed(1)+' km/h' : '—'}`;
+  }
+  show(data);
+  // refresh every 10s
+  if (!window._nowinspace_iss_tick) {
+    window._nowinspace_iss_tick = setInterval(async () => {
+      const d = await safeFetch(url);
+      if (d) show(d);
+    }, 10000);
+  }
+}
+
+/* --- Filters --- */
+function filterNews(q) {
+  const filtered = NEWS_ITEMS.filter(i => (i.title + ' ' + (i.summary||'') + ' ' + (i.newsSite||'')).toLowerCase().includes(q.toLowerCase()));
+  renderNewsCards(filtered);
+  document.getElementById('newsMeta').textContent = `Filtered: ${filtered.length} results for "${q}"`;
+}
+function clearFilter() {
+  renderNewsCards(NEWS_ITEMS);
+  document.getElementById('newsMeta').textContent = `Showing ${NEWS_ITEMS.length} articles`;
+}
+
+/* --- Init --- */
+async function init() {
+  loadAPOD();
+  await Promise.all([loadNews(), loadLaunches(), loadISS()]);
+}
+init();
+
+</script>
 </body>
 </html>
