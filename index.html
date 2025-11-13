@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>orcus — Live Space News & Launches</title>
+  <title>NowInSpace — Live Space News & Launches</title>
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
@@ -22,7 +22,6 @@
       -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
 
-    /* Header / Mast */
     header{
       background:linear-gradient(180deg, #fff 60%, #f6f6f6 100%);
       border-bottom:1px solid #eee;
@@ -37,11 +36,9 @@
     nav a{color:#222; text-decoration:none; font-size:14px; padding:8px 12px; border-radius:8px}
     nav a.primary{background:var(--accent); color:white}
 
-    /* Layout */
     .wrap{max-width:var(--max-width); margin:26px auto; padding:0 16px; display:grid; grid-template-columns:1fr 340px; gap:28px;}
     @media (max-width:980px){ .wrap{grid-template-columns:1fr} nav{display:none} }
 
-    /* Left column feed */
     .hero{
       background:linear-gradient(180deg, #ffffff 0%, #fff 100%);
       border-radius:var(--card-radius); overflow:hidden; box-shadow:0 8px 30px rgba(20,20,20,0.04);
@@ -64,20 +61,18 @@
     .card .info p{margin:8px 0 0;color:var(--muted); font-size:13px}
     .card .metaSmall{font-size:12px; color:var(--muted); margin-top:8px}
 
-    /* Sidebar */
     aside .panel{background:white; padding:14px; border-radius:12px; box-shadow:0 6px 20px rgba(20,20,20,0.04); margin-bottom:16px}
     .launch{display:flex; gap:12px; align-items:center}
     .launch .when{flex:1}
     .countdown{font-weight:600; color:var(--accent)}
 
-    /* Footer */
     footer{text-align:center; color:var(--muted); font-size:13px; padding:40px 0 80px}
 
-    /* Small */
     .small{font-size:13px; color:var(--muted)}
     a.source{color:var(--accent); text-decoration:none; font-weight:600}
     .skeleton{background:linear-gradient(90deg,#eee,#f5f5f5,#eee); background-size:200% 100%; animation:shimmer 1.6s linear infinite}
     @keyframes shimmer{from{background-position:200% 0} to{background-position:-200% 0}}
+    button.small{background:#f3f3f3;border:0;padding:8px;border-radius:8px;cursor:pointer}
   </style>
 </head>
 <body>
@@ -85,7 +80,7 @@
   <header>
     <div class="topbar">
       <div class="brand">
-        <div class="title">orcus-NowInSpace</div>
+        <div class="title">NowInSpace</div>
         <div class="kicker">Live space news, launches & imagery</div>
       </div>
       <nav>
@@ -145,23 +140,15 @@
   </main>
 
   <footer>
-    Built with public APIs • Data from NASA, Spaceflight News, TheSpaceDevs & Open-Notify
+    Built with public APIs • Data from NASA, Spaceflight News, TheSpaceDevs & RSS fallbacks
   </footer>
 
 <script>
-/*
- NowInSpace — client-only site script
- - Fetches APOD from NASA (DEMO_KEY by default)
- - Fetches latest articles from Spaceflight News API
- - Fetches upcoming launches from TheSpaceDevs Launch Library
- - Fetches ISS position from Open Notify
- - All fetches are done client-side (CORS-friendly public APIs)
-*/
+/* Client-only script with robust news fallback */
 
-const NASA_API_KEY = 'DEMO_KEY'; // Replace with your API key if you want
+const NASA_API_KEY = 'DEMO_KEY'; // optional: replace for higher rate limits
 
-// Helper: safe fetch with timeout
-async function safeFetch(url, opts = {}, timeout = 12000) {
+async function safeFetchJson(url, opts = {}, timeout = 12000) {
   try {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
@@ -170,7 +157,20 @@ async function safeFetch(url, opts = {}, timeout = 12000) {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return await res.json();
   } catch (e) {
-    console.warn('fetch error', url, e.message || e);
+    console.warn('safeFetchJson error', url, e && e.message);
+    return null;
+  }
+}
+async function safeFetchText(url, opts = {}, timeout = 12000) {
+  try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    const res = await fetch(url, {...opts, signal: controller.signal});
+    clearTimeout(id);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.text();
+  } catch (e) {
+    console.warn('safeFetchText error', url, e && e.message);
     return null;
   }
 }
@@ -182,7 +182,7 @@ async function loadAPOD() {
   const heroDesc = document.getElementById('heroDesc');
 
   const url = `https://api.nasa.gov/planetary/apod?api_key=${encodeURIComponent(NASA_API_KEY)}`;
-  const data = await safeFetch(url);
+  const data = await safeFetchJson(url);
   if (!data) {
     heroMedia.className = 'media';
     heroMedia.innerHTML = '<div style="padding:30px"><strong>Could not load image.</strong></div>';
@@ -192,9 +192,7 @@ async function loadAPOD() {
   }
 
   heroMedia.className = 'media';
-  // if video, show thumbnail if available
   if (data.media_type === 'video') {
-    // embed link
     heroMedia.innerHTML = `<iframe src="${data.url}" style="width:100%;height:100%;border:0" title="APOD video" frameborder="0" allowfullscreen></iframe>`;
   } else {
     const img = document.createElement('img');
@@ -207,44 +205,88 @@ async function loadAPOD() {
   heroDesc.textContent = (data.explanation || '').slice(0, 220) + (data.explanation && data.explanation.length > 220 ? '…' : '');
 }
 
-/* --- Spaceflight News --- */
-let NEWS_ITEMS = []; // keep for filtering
+/* --- News: try primary API then RSS fallback --- */
+let NEWS_ITEMS = [];
+
 async function loadNews() {
+  document.getElementById('newsMeta').textContent = 'Loading news…';
+  // Try primary API first
   const endpoint = 'https://api.spaceflightnewsapi.net/v3/articles?_limit=12';
-  const data = await safeFetch(endpoint);
-  const container = document.getElementById('newsCards');
-  const meta = document.getElementById('newsMeta');
-  if (!data) {
-    container.innerHTML = '<div class="small">Could not load news. Try again later.</div>';
-    meta.textContent = 'News unavailable';
+  const data = await safeFetchJson(endpoint);
+  if (data && Array.isArray(data) && data.length > 0) {
+    console.log('Loaded news from Spaceflight API');
+    NEWS_ITEMS = normalizeSpaceflightItems(data);
+    document.getElementById('newsMeta').textContent = `Showing ${NEWS_ITEMS.length} articles — updated ${new Date().toLocaleString()}`;
+    renderNewsCards(NEWS_ITEMS);
     return;
   }
-  NEWS_ITEMS = data;
-  meta.textContent = `Showing ${data.length} articles — updated ${new Date().toLocaleString()}`;
-  renderNewsCards(data);
+
+  // Primary failed -> fallback to RSS feeds via AllOrigins (CORS proxy)
+  console.warn('Spaceflight API failed — using RSS fallback');
+  document.getElementById('newsMeta').textContent = 'Using RSS fallback (may be slower)';
+  const rssFeeds = [
+    'https://www.sciencedaily.com/rss/top/science.xml',
+    'https://www.space.com/feeds/all',
+    'https://www.esa.int/rssfeed/Latest_News',
+  ];
+  let items = [];
+  for (const feed of rssFeeds) {
+    try {
+      // allorigins proxy: returns raw content with CORS headers
+      const prox = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(feed);
+      const xml = await safeFetchText(prox);
+      if (!xml) continue;
+      const parsed = parseRSS(xml);
+      items.push(...parsed);
+    } catch (e) {
+      console.warn('rss fetch error', feed, e);
+    }
+    if (items.length >= 12) break;
+  }
+  if (items.length === 0) {
+    document.getElementById('newsCards').innerHTML = '<div class="small">Could not load news. Try again later.</div>';
+    document.getElementById('newsMeta').textContent = 'News unavailable';
+    return;
+  }
+  NEWS_ITEMS = items.slice(0, 12);
+  document.getElementById('newsMeta').textContent = `Showing ${NEWS_ITEMS.length} articles (RSS)`;
+  renderNewsCards(NEWS_ITEMS);
+}
+
+function normalizeSpaceflightItems(arr) {
+  return arr.map(it => {
+    return {
+      title: it.title || it.name || '',
+      summary: it.summary || it.summary || it.summary || (it.summary ? it.summary : it.summary),
+      image: it.imageUrl || it.image_url || it.image || it.imageUrl,
+      url: it.url || it.link || it._id || '',
+      source: it.newsSite || it.provider || '',
+      publishedAt: it.publishedAt || it.published_at || it.publishedAt
+    };
+  });
 }
 
 function renderNewsCards(items) {
   const container = document.getElementById('newsCards');
   container.innerHTML = '';
-  if (!items || items.length === 0) {
-    container.innerHTML = '<div class="small">No articles found.</div>'; return;
-  }
+  if (!items || items.length === 0) { container.innerHTML = '<div class="small">No articles found.</div>'; return; }
   items.forEach(it => {
     const card = document.createElement('article');
     card.className = 'card';
     const thumb = document.createElement('div'); thumb.className = 'thumb';
     const img = document.createElement('img');
-    img.src = it.imageUrl || it.image_url || 'https://via.placeholder.com/300x180?text=Space';
+    const srcImg = it.image || it.imageUrl || it.thumbnail || extractImageFromHTML(it.summary || '') || 'https://via.placeholder.com/300x180?text=Space';
+    img.src = srcImg;
     img.alt = it.title || 'article';
     thumb.appendChild(img);
 
     const info = document.createElement('div'); info.className = 'info';
-    const h3 = document.createElement('h3'); h3.textContent = it.title;
-    const p = document.createElement('p'); p.textContent = (it.summary || it.summary || '').slice(0, 160) + (it.summary && it.summary.length>160 ? '…' : '');
+    const h3 = document.createElement('h3'); h3.textContent = it.title || '';
+    const p = document.createElement('p'); p.textContent = (stripHTML(it.summary || it.description || '') || '').slice(0, 160) + ((it.summary||'').length > 160 ? '…' : '');
     const m = document.createElement('div'); m.className = 'metaSmall';
-    const d = new Date(it.publishedAt || it.publishedAt || it.publishedAt || it.published_at || it.publishedAt || it.updated_at || it.publishedAt);
-    m.innerHTML = `<span>${it.newsSite || it.source || ''} · ${isNaN(d)? '': d.toLocaleDateString()}</span> &nbsp; <a class="source" href="${it.url || it.link}" target="_blank" rel="noopener">Read source</a>`;
+    const d = new Date(it.publishedAt || it.published_at || it.pubDate || '');
+    const dateStr = isNaN(d) ? '' : d.toLocaleDateString();
+    m.innerHTML = `<span>${it.source || ''} ${dateStr ? '· ' + dateStr : ''}</span> &nbsp; <a class="source" href="${it.url || it.link || '#'}" target="_blank" rel="noopener">Read source</a>`;
 
     info.appendChild(h3); info.appendChild(p); info.appendChild(m);
 
@@ -253,17 +295,54 @@ function renderNewsCards(items) {
   });
 }
 
+/* --- RSS parsing helpers (browser DOMParser) --- */
+function parseRSS(xmlText) {
+  try {
+    const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+    const items = Array.from(doc.querySelectorAll('item')).map(node => {
+      const title = (node.querySelector('title') && node.querySelector('title').textContent) || '';
+      const link = (node.querySelector('link') && node.querySelector('link').textContent) || (node.querySelector('guid') && node.querySelector('guid').textContent) || '';
+      const descNode = node.querySelector('description');
+      const description = descNode ? descNode.textContent : (node.querySelector('summary') ? node.querySelector('summary').textContent : '');
+      let image = null;
+      const enclosure = node.querySelector('enclosure');
+      if (enclosure && enclosure.getAttribute('url')) image = enclosure.getAttribute('url');
+      if (!image) {
+        const media = node.querySelector('media\\:content, media\\:thumbnail, thumbnail');
+        if (media && media.getAttribute('url')) image = media.getAttribute('url');
+      }
+      if (!image) {
+        // try to extract img from description HTML
+        image = extractImageFromHTML(description);
+      }
+      const pubDate = (node.querySelector('pubDate') && node.querySelector('pubDate').textContent) || (node.querySelector('dc\\:date') && node.querySelector('dc\\:date').textContent) || '';
+      return { title, url: link, summary: description, image, source: '', publishedAt: pubDate };
+    });
+    return items;
+  } catch (e) {
+    console.warn('parseRSS failed', e && e.message);
+    return [];
+  }
+}
+function extractImageFromHTML(html) {
+  if (!html) return null;
+  const m = html.match(/<img[^>]+src=['"]([^'"]+)['"]/i);
+  return m ? m[1] : null;
+}
+function stripHTML(html) {
+  if (!html) return '';
+  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+}
+
 /* --- Launches (TheSpaceDevs) --- */
-let LAUNCHES = [];
 async function loadLaunches() {
   const endpoint = 'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=8&mode=detailed';
-  const data = await safeFetch(endpoint);
+  const data = await safeFetchJson(endpoint);
   const list = document.getElementById('launchList');
   if (!data || !data.results) {
     list.innerHTML = '<div class="small">Could not load launches.</div>';
     return;
   }
-  LAUNCHES = data.results;
   renderLaunches(data.results);
 }
 
@@ -279,17 +358,15 @@ function renderLaunches(items) {
     when.className = 'when';
     const name = document.createElement('div'); name.textContent = ln.name; name.style.fontWeight = 600;
     const t = new Date(ln.net);
-    const dt = document.createElement('div'); dt.className = 'small'; dt.textContent = t.toLocaleString();
+    const dt = document.createElement('div'); dt.className = 'small'; dt.textContent = isNaN(t) ? 'TBA' : t.toLocaleString();
 
     const countdown = document.createElement('div'); countdown.className = 'countdown small';
     countdown.setAttribute('data-net', ln.net);
-    // initial countdown value
     updateCountdownElement(countdown);
 
     when.appendChild(name); when.appendChild(dt); when.appendChild(countdown);
-    // agency image if present
     const logo = document.createElement('div'); logo.style.width='56px'; logo.style.height='56px';
-    if (ln.rocket && ln.image) {
+    if (ln.image) {
       const im = document.createElement('img'); im.src = ln.image; im.alt = ln.name; im.style.width='56px'; im.style.height='56px'; im.style.objectFit='cover'; im.style.borderRadius='8px';
       logo.appendChild(im);
     } else {
@@ -300,14 +377,12 @@ function renderLaunches(items) {
     list.appendChild(el);
   });
 
-  // start countdown interval
   if (!window._nowinspace_countdown_tick) {
     window._nowinspace_countdown_tick = setInterval(()=> {
       document.querySelectorAll('.countdown').forEach(updateCountdownElement);
     }, 1000);
   }
 }
-
 function updateCountdownElement(el) {
   if (!el) return;
   const dt = el.getAttribute('data-net');
@@ -317,15 +392,16 @@ function updateCountdownElement(el) {
   if (isNaN(diff)) { el.textContent = 'TBA'; return; }
   if (diff <= 0) { el.textContent = 'Launched'; return; }
   const s = Math.floor(diff / 1000);
-  const days = Math.floor(s / 86400); const hours = Math.floor((s % 86400) / 3600);
+  const days = Math.floor(s / 86400);
+  const hours = Math.floor((s % 86400) / 3600);
   const mins = Math.floor((s % 3600) / 60); const secs = s % 60;
   el.textContent = (days>0? days+'d ':'') + String(hours).padStart(2,'0')+':' + String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
 }
 
 /* --- ISS position --- */
 async function loadISS() {
-  const url = 'https://api.wheretheiss.at/v1/satellites/25544'; // wheretheiss.at has CORS and richer info
-  const data = await safeFetch(url);
+  const url = 'https://api.wheretheiss.at/v1/satellites/25544';
+  const data = await safeFetchJson(url);
   const info = document.getElementById('issInfo');
   if (!data) {
     info.textContent = 'Could not fetch ISS position.';
@@ -335,10 +411,9 @@ async function loadISS() {
     info.innerHTML = `Latitude: ${d.latitude.toFixed(2)}°, Longitude: ${d.longitude.toFixed(2)}° <br> Alt: ${d.altitude ? d.altitude.toFixed(1)+' km' : '—'} • Vel: ${d.velocity ? d.velocity.toFixed(1)+' km/h' : '—'}`;
   }
   show(data);
-  // refresh every 10s
   if (!window._nowinspace_iss_tick) {
     window._nowinspace_iss_tick = setInterval(async () => {
-      const d = await safeFetch(url);
+      const d = await safeFetchJson(url);
       if (d) show(d);
     }, 10000);
   }
@@ -346,7 +421,7 @@ async function loadISS() {
 
 /* --- Filters --- */
 function filterNews(q) {
-  const filtered = NEWS_ITEMS.filter(i => (i.title + ' ' + (i.summary||'') + ' ' + (i.newsSite||'')).toLowerCase().includes(q.toLowerCase()));
+  const filtered = NEWS_ITEMS.filter(i => (i.title + ' ' + (i.summary||'') + ' ' + (i.source||'')).toLowerCase().includes(q.toLowerCase()));
   renderNewsCards(filtered);
   document.getElementById('newsMeta').textContent = `Filtered: ${filtered.length} results for "${q}"`;
 }
@@ -361,7 +436,6 @@ async function init() {
   await Promise.all([loadNews(), loadLaunches(), loadISS()]);
 }
 init();
-
 </script>
 </body>
 </html>
