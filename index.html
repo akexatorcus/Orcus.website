@@ -1,309 +1,57 @@
-
-const express = require('express');
-const axios = require('axios');
-const cheerio = require('cheerio');
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Configuration
-const SEED_SITES = [
-  'https://phys.org',
-  'https://www.sciencedaily.com',
-  'https://www.nature.com',
-  'https://www.theguardian.com/science',
-  'https://www.scientificamerican.com'
-];
-const USER_AGENT = 'Science-Snippets-Bot/1.0 (+https://example.com)';
-const CACHE_TTL_MS = 1000 * 60 * 5; // 5 minutes
-
-// Simple in-memory cache
-const cache = new Map();
-function cacheGet(key){
-  const obj = cache.get(key);
-  if(!obj) return null;
-  if(Date.now() - obj.ts > CACHE_TTL_MS){ cache.delete(key); return null; }
-  return obj.value;
-}
-function cacheSet(key, value){ cache.set(key, { ts: Date.now(), value }); }
-
-// Utilities
-async function fetchUrl(url){
-  try{
-    const resp = await axios.get(url, { headers: { 'User-Agent': USER_AGENT }, timeout: 10000 });
-    return resp.data;
-  }catch(e){ return null; }
-}
-
-function makeAbsolute(src, base){
-  try{
-    if(!src) return null;
-    if(src.startsWith('http')) return src;
-    if(src.startsWith('//')) return 'https:' + src;
-    if(!base) return src;
-    return new URL(src, base).href;
-  }catch(e){ return src; }
-}
-
-function summarizeText(text, max=140){
-  if(!text) return '';
-  const clean = text.replace(/\s+/g, ' ').trim();
-  if(clean.length <= max) return clean;
-  let truncated = clean.slice(0, max);
-  const lastPeriod = truncated.lastIndexOf('.');
-  if(lastPeriod > Math.floor(max * 0.6)) truncated = truncated.slice(0, lastPeriod + 1);
-  return truncated.trim() + '…';
-}
-
-// Extract title, description, image from a page (uses og: tags then fallbacks)
-async function extractFromPage(url){
-  const key = 'page:' + url;
-  const cached = cacheGet(key);
-  if(cached) return cached;
-  const html = await fetchUrl(url);
-  if(!html) return null;
-  const $ = cheerio.load(html);
-  const title = ($('meta[property="og:title"]').attr('content') || $('title').text() || $('h1').first().text() || '').trim();
-  let desc = ($('meta[name="description"]').attr('content') || '').trim();
-  if(!desc){
-    // pick first paragraph with some length
-    $('p').each((i, el) => { if(!desc){ const t = $(el).text().trim(); if(t && t.length > 30) desc = t; } });
-  }
-  let img = $('meta[property="og:image"]').attr('content') || $('meta[name="twitter:image"]').attr('content') || null;
-  if(!img){ const firstImg = $('img').first().attr('src'); img = firstImg || null; }
-  img = makeAbsolute(img, url);
-  const out = { title: title || url, text: summarizeText(desc || title || ''), image: img, sourceUrl: url, source: (new URL(url)).host };
-  cacheSet(key, out);
-  return out;
-}
-
-// Crawl a site homepage for links that match the query (best-effort)
-async function crawlSiteForQuery(site, query, limit = 8){
-  const key = `crawl:${site}:${query}`;
-  const cached = cacheGet(key);
-  if(cached) return cached;
-  const html = await fetchUrl(site);
-  if(!html) return [];
-  const $ = cheerio.load(html);
-  const links = new Map();
-
-  // Collect anchors under article/h2/h3 and general anchors
-  $('article a[href], h2 a[href], h3 a[href], a[href]').each((i, el) => {
-    try{
-      let href = $(el).attr('href');
-      if(!href) return;
-      const text = ($(el).text() || '').trim();
-      if(href.startsWith('/')) href = new URL(href, site).href;
-      if(!href.startsWith('http')) return;
-      if(href.match(/\.(pdf|jpg|png|gif|zip)$/i)) return;
-      const score = (text.toLowerCase().includes(query.toLowerCase()) ? 2 : 0) + (href.toLowerCase().includes(query.toLowerCase()) ? 2 : 0);
-      if(!links.has(href) || links.get(href).score < score){ links.set(href, { url: href, text, score }); }
-    }catch(e){}
-  });
-
-  const arr = Array.from(links.values()).sort((a,b) => (b.score - a.score) || (b.text.length - a.text.length)).slice(0, limit).map(x => x.url);
-  cacheSet(key, arr);
-  return arr;
-}
-
-// Search endpoint: look across seed sites, extract pages, return snippets
-app.get('/api/search', async (req, res) => {
-  const q = (req.query.q || '').trim();
-  if(!q) return res.json({ ok: false, error: 'no query' });
-  const cacheKey = 'search:' + q.toLowerCase();
-  const cached = cacheGet(cacheKey);
-  if(cached) return res.json({ ok: true, items: cached });
-
-  try{
-    const crawls = await Promise.all(SEED_SITES.map(site => crawlSiteForQuery(site, q, 6)));
-    let candidates = Array.from(new Set(crawls.flat())).slice(0, 40);
-
-    // Fallback: if nothing matched the query, grab some recent links from each site
-    if(candidates.length === 0){
-      for(const site of SEED_SITES){
-        const html = await fetchUrl(site);
-        if(!html) continue;
-        const $ = cheerio.load(html);
-        $('article a[href], h2 a[href], h3 a[href], a[href]').each((i,el) => {
-          if(candidates.length >= 40) return;
-          let href = $(el).attr('href');
-          if(!href) return;
-          if(href.startsWith('/')) href = new URL(href, site).href;
-          if(!href.startsWith('http')) return;
-          if(!candidates.includes(href)) candidates.push(href);
-        });
-      }
-    }
-
-    // Extract info from candidate pages with concurrency control
-    const results = [];
-    const CONC = 6;
-    for(let i=0;i<candidates.length;i+=CONC){
-      const batch = candidates.slice(i, i+CONC);
-      const batchRes = await Promise.all(batch.map(u => extractFromPage(u).catch(() => null)));
-      batchRes.forEach(r => { if(r) results.push(r); });
-      if(results.length >= 20) break;
-    }
-
-    // Deduplicate and prefer pages with images
-    const seen = new Set();
-    const final = [];
-    for(const r of results){
-      if(seen.has(r.sourceUrl)) continue;
-      seen.add(r.sourceUrl);
-      final.push(r);
-      if(final.length >= 20) break;
-    }
-
-    cacheSet(cacheKey, final);
-    return res.json({ ok: true, items: final });
-  }catch(e){ return res.json({ ok: false, error: String(e) }); }
-});
-
-// Fetch single URL and return extracted snippet
-app.get('/api/fetch', async (req, res) => {
-  const url = req.query.url;
-  if(!url) return res.json({ ok: false, error: 'no url' });
-  try{
-    const fact = await extractFromPage(url);
-    if(!fact) return res.json({ ok: false, error: 'could not fetch' });
-    res.json({ ok: true, fact });
-  }catch(e){ res.json({ ok: false, error: String(e) }); }
-});
-
-// Frontend: single-page app (same visual style as before)
-app.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.send(`<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Science Snippets</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">
-<style>
-  :root{--accent:#c21807;--muted:#6b6b6b;--max-width:1100px}
-  body{font-family:Roboto,system-ui,Arial;line-height:1.45;color:#111;margin:0;background:#fafafa}
-  .container{max-width:var(--max-width);margin:30px auto;padding:20px}
-  header{display:flex;align-items:center;gap:18px}
-  .mast{font-family:Merriweather,serif;font-size:34px;color:#111}
-  .tagline{color:var(--muted);font-size:14px}
-  .search{margin-left:auto}
-  .search input{padding:10px 12px;border-radius:6px;border:1px solid #ddd;width:320px}
-  main{display:grid;grid-template-columns:1fr 360px;gap:28px;margin-top:20px}
-  .feed{background:white;padding:18px;border-radius:8px;box-shadow:0 6px 20px rgba(30,30,30,0.04)}
-  .card{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid #eee}
-  .card:last-child{border-bottom:none}
-  .thumb{width:110px;height:72px;flex:0 0 110px;border-radius:6px;overflow:hidden;background:#ddd}
-  .thumb img{width:100%;height:100%;object-fit:cover}
-  .meta h3{margin:0;font-size:16px}
-  .meta p{margin:6px 0 0;color:var(--muted);font-size:13px}
-  .source{font-size:12px;color:var(--muted);margin-top:6px}
-  aside .panel{background:white;padding:14px;border-radius:8px;box-shadow:0 6px 20px rgba(30,30,30,0.04)}
-  .btn{display:inline-block;padding:8px 12px;border-radius:6px;text-decoration:none;background:var(--accent);color:white}
-  footer{color:var(--muted);text-align:center;margin-top:26px;font-size:13px}
-  .small{font-size:12px;color:var(--muted)}
-  a.source-link{color:var(--accent);text-decoration:none}
-  @media (max-width:880px){main{grid-template-columns:1fr} .search input{width:180px}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Science Facts Daily</title>
+  <style>
+    body { font-family: 'Helvetica Neue', sans-serif; background:#f7f7f7; margin:0; }
+    header { background:black; color:white; padding:20px; text-align:center; font-size:1.5em; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; padding:20px; }
+    .card { background:white; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.1); overflow:hidden; transition:transform .2s; }
+    .card:hover { transform:translateY(-5px); }
+    img { width:100%; height:180px; object-fit:cover; }
+    .content { padding:15px; }
+    a { text-decoration:none; color:#0073e6; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div>
-        <div class="mast">Science Snippets</div>
-        <div class="tagline">Short science facts, bite-sized and sourced — built for curious minds</div>
-      </div>
-      <div class="search">
-        <input id="q" placeholder="Search topic (eg: astronomy, AI, climate)" />
-        <button id="searchBtn" class="btn" style="margin-left:8px">Search</button>
-      </div>
-    </header>
+  <header>🔬 Science Facts Daily</header>
+  <div id="facts" class="grid"></div>
 
-    <main>
-      <section class="feed" id="feed">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <strong>Latest snippets</strong>
-          <div class="small" id="status">Enter a topic and press Search</div>
-        </div>
-        <div id="items"></div>
-      </section>
+  <script>
+    async function loadFacts() {
+      const rssUrls = [
+        "https://www.sciencedaily.com/rss/top/science.xml",
+        "https://www.nasa.gov/rss/dyn/breaking_news.rss"
+      ];
 
-      <aside>
-        <div class="panel">
-          <h4 style="margin:0 0 8px 0">How this works</h4>
-          <p class="small">This demo crawls several science sites' public pages, finds candidate articles, extracts a short text snippet and an image (if available). Click "Read source" on any card to open the original article.</p>
-          <p class="small">For production, use official APIs/RSS and respect robots.txt.</p>
-        </div>
-        <div style="height:16px"></div>
-        <div class="panel">
-          <h4 style="margin:0 0 8px 0">Quick topics</h4>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <a class="small" href="#" onclick="quick('astronomy')">Astronomy</a>
-            <a class="small" href="#" onclick="quick('ai')">AI</a>
-            <a class="small" href="#" onclick="quick('climate')">Climate</a>
-            <a class="small" href="#" onclick="quick('neuroscience')">Neuroscience</a>
+      const container = document.getElementById('facts');
+      container.innerHTML = "Loading science facts...";
+
+      const allItems = [];
+      for (const url of rssUrls) {
+        const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+        if (data.items) allItems.push(...data.items);
+      }
+
+      container.innerHTML = "";
+      allItems.slice(0, 12).forEach(item => {
+        const div = document.createElement('div');
+        div.className = "card";
+        div.innerHTML = `
+          <img src="${item.enclosure?.link || item.thumbnail || 'https://via.placeholder.com/400x180?text=Science'}" alt="">
+          <div class="content">
+            <h3>${item.title}</h3>
+            <p>${item.description.replace(/<[^>]+>/g, '').slice(0, 120)}...</p>
+            <a href="${item.link}" target="_blank">Read Source →</a>
           </div>
-        </div>
-      </aside>
-    </main>
-
-    <footer>
-      Built as a single-file demo • Click a card's "Read source" to view the original article
-    </footer>
-  </div>
-
-<script>
-  const itemsEl = document.getElementById('items');
-  const statusEl = document.getElementById('status');
-  document.getElementById('searchBtn').addEventListener('click', doSearch);
-  document.getElementById('q').addEventListener('keypress', (e)=>{ if(e.key==='Enter') doSearch(); });
-
-  function quick(topic){ document.getElementById('q').value = topic; doSearch(); }
-
-  async function doSearch(){
-    const q = document.getElementById('q').value.trim();
-    if(!q) return alert('Please enter a topic');
-    setStatus('Searching for "'+q+'"...');
-    itemsEl.innerHTML = '';
-    try{
-      const res = await fetch('/api/search?q=' + encodeURIComponent(q));
-      const json = await res.json();
-      if(!json.ok) { setStatus(json.error || 'No results'); return; }
-      renderItems(json.items);
-      setStatus('Showing ' + json.items.length + ' items');
-    }catch(e){ setStatus('Error fetching results'); }
-  }
-
-  function setStatus(t){ statusEl.textContent = t; }
-
-  function renderItems(items){
-    if(!items || items.length===0){ itemsEl.innerHTML = '<p class="small">No snippets found.</p>'; return; }
-    itemsEl.innerHTML = '';
-    items.forEach(it => {
-      const card = document.createElement('div'); card.className='card';
-      const thumb = document.createElement('div'); thumb.className='thumb';
-      if(it.image){ const img = document.createElement('img'); img.src = it.image; img.alt = it.title || '' ; thumb.appendChild(img); }
-      const meta = document.createElement('div'); meta.className='meta';
-      const h3 = document.createElement('h3'); h3.textContent = it.title || 'Untitled';
-      const p = document.createElement('p'); p.textContent = it.text || '';
-      const src = document.createElement('div'); src.className='source';
-      const encoded = encodeURIComponent(it.sourceUrl || '');
-      src.innerHTML = '<span class="small">' + (it.source || '') + '</span> &nbsp; <a class="source-link" target="_blank" href="#" onclick="openSource(\'' + encoded + '\')">Read source</a>';
-      meta.appendChild(h3); meta.appendChild(p); meta.appendChild(src);
-      card.appendChild(thumb); card.appendChild(meta);
-      itemsEl.appendChild(card);
-    });
-  }
-
-  function openSource(encoded){
-    const url = decodeURIComponent(encoded);
-    if(!url) return;
-    window.open(url, '_blank');
-  }
-</script>
+        `;
+        container.appendChild(div);
+      });
+    }
+    loadFacts();
+  </script>
 </body>
-</html>`);
-});
-
-app.listen(PORT, () => console.log(`Science Snippets running at http://localhost:${PORT}`));
-
+</html>
