@@ -3,335 +3,366 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>orcus — Reliable Space News</title>
+  <title>OrbitFeed — Astronomy Pictures (APOD)</title>
+  <meta name="description" content="OrbitFeed — Daily astronomy images from NASA APOD. Clean magazine UI inspired by MIT Technology Review." />
+
+  <!-- Fonts (MIT Tech Review-like feel) -->
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
   <style>
-    :root{--accent:#c21807;--muted:#6b6b6b;--max-width:1100px;--card-radius:12px;--bg:#fbfbfb}
+    :root{
+      --accent:#c21807;
+      --muted:#6b6b6b;
+      --max-width:1150px;
+      --card-radius:12px;
+      --bg:#fbfbfb;
+    }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:#111}
-    header{padding:18px;border-bottom:1px solid #eee;background:white;position:sticky;top:0;z-index:20}
-    .top{max-width:var(--max-width);margin:0 auto;display:flex;align-items:center;gap:16px}
-    .brand{font-family:Merriweather,serif;font-size:24px}
-    .wrap{max-width:var(--max-width);margin:20px auto;padding:0 16px;display:grid;grid-template-columns:1fr 340px;gap:24px}
-    @media(max-width:980px){.wrap{grid-template-columns:1fr}}
-    .hero{background:white;border-radius:var(--card-radius);overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.04)}
-    .media{width:100%;height:360px;background:#ddd;display:flex;align-items:center;justify-content:center;overflow:hidden}
-    .media img{width:100%;height:100%;object-fit:cover}
-    .meta{padding:14px}
-    .cards{display:flex;flex-direction:column;gap:12px;margin-top:8px}
-    .card{background:white;border-radius:10px;padding:12px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 6px 18px rgba(0,0,0,0.03)}
-    .thumb{width:140px;height:88px;border-radius:8px;overflow:hidden;background:#eee;flex:0 0 140px}
-    .thumb img{width:100%;height:100%;object-fit:cover}
-    .info h3{margin:0;font-size:16px}
-    .info p{margin:8px 0 0;color:var(--muted);font-size:13px}
-    aside .panel{background:white;padding:12px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.03);margin-bottom:12px}
+    body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:#111;-webkit-font-smoothing:antialiased}
+
+    /* Header */
+    header{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:40}
+    .top{max-width:var(--max-width);margin:0 auto;padding:20px 18px;display:flex;align-items:center;gap:18px}
+    .brand{display:flex;flex-direction:column}
+    .brand .title{font-family:Merriweather,serif;font-size:28px;margin:0}
+    .brand .kicker{font-size:12px;color:var(--muted)}
+    .search{margin-left:auto;display:flex;gap:8px;align-items:center}
+    .search input{padding:8px 12px;border-radius:8px;border:1px solid #e6e6e6;min-width:220px}
+
+    /* Layout */
+    .wrap{max-width:var(--max-width);margin:28px auto;padding:0 18px;display:grid;grid-template-columns:1fr 360px;gap:28px}
+    @media (max-width:980px){.wrap{grid-template-columns:1fr;padding:0 12px}.search{display:none}}
+
+    /* Hero */
+    .hero{background:#fff;border-radius:var(--card-radius);overflow:hidden;box-shadow:0 10px 30px rgba(20,20,20,0.04)}
+    .hero-media{width:100%;height:460px;background:#111;display:flex;align-items:center;justify-content:center}
+    .hero-media img{width:100%;height:100%;object-fit:cover}
+    .hero-content{padding:18px}
+    .hero-content h1{font-family:Merriweather,serif;margin:0 0 8px;font-size:22px}
+    .hero-content p{margin:0;color:var(--muted)}
+    .hero-meta{margin-top:10px;font-size:13px;color:var(--muted)}
+
+    /* Feed */
+    .feed-header{display:flex;justify-content:space-between;align-items:center;margin:16px 0}
+    .cards{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:900px){.cards{grid-template-columns:1fr 1fr}}
+
+    .card{background:#fff;border-radius:10px;display:flex;gap:12px;padding:12px;align-items:flex-start;box-shadow:0 8px 24px rgba(20,20,20,0.04)}
+    .card .thumb{width:160px;height:100px;border-radius:8px;overflow:hidden;background:#ddd;flex:0 0 160px}
+    .card .thumb img{width:100%;height:100%;object-fit:cover}
+    .card .meta{flex:1}
+    .meta h3{margin:0;font-size:16px}
+    .meta p{margin:8px 0 0;color:var(--muted);font-size:13px}
+    .meta .metaLine{margin-top:8px;font-size:12px;color:var(--muted)}
+
+    /* Sidebar */
+    aside .panel{background:#fff;border-radius:10px;padding:14px;box-shadow:0 8px 24px rgba(20,20,20,0.04);margin-bottom:14px}
+    .panel h4{margin:0 0 8px 0}
     .small{font-size:13px;color:var(--muted)}
-    .btn{background:var(--accent);color:white;padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
-    .outline{background:#f3f3f3;color:#333;padding:8px;border-radius:8px;border:0;cursor:pointer}
+
+    /* Modal */
+    .modal{position:fixed;inset:0;background:rgba(10,10,10,0.6);display:flex;align-items:center;justify-content:center;padding:20px;z-index:80}
+    .modal .sheet{background:#fff;border-radius:12px;max-width:1000px;width:100%;max-height:90vh;overflow:auto}
+    .modal .media{height:60vh}
+    .modal .content{padding:18px}
+
+    /* Buttons */
+    .btn{background:var(--accent);color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
+    .link{color:var(--accent);text-decoration:none;font-weight:600}
+
+    footer{text-align:center;color:var(--muted);padding:28px 0}
+
+    /* small helpers */
+    .muted{color:var(--muted)}
     .skeleton{background:linear-gradient(90deg,#eee,#f5f5f5,#eee);background-size:200% 100%;animation:shimmer 1.2s linear infinite}
     @keyframes shimmer{from{background-position:200% 0} to{background-position:-200% 0}}
-    footer{text-align:center;padding:36px;color:var(--muted);font-size:13px}
   </style>
 </head>
 <body>
   <header>
     <div class="top">
-      <div class="brand">orcus-NowInSpace</div>
-      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <button id="refreshBtn" class="outline">Refresh</button>
-        <button id="forceRefreshBtn" class="btn">Force refresh</button>
+      <div class="brand">
+        <div class="title">OrbitFeed</div>
+        <div class="kicker">Daily astronomy images & mini-magazine</div>
+      </div>
+      <div class="search">
+        <input id="q" placeholder="Search title or explanation" />
+        <button id="refresh" class="btn">Refresh</button>
       </div>
     </div>
   </header>
 
   <main class="wrap">
     <section>
-      <div class="hero">
-        <div id="heroMedia" class="media skeleton"></div>
-        <div class="meta">
-          <h2 id="heroTitle">Loading featured astronomy image…</h2>
-          <p id="heroDesc" class="small">Fetching APOD (cached for reliability).</p>
+      <div class="hero" id="hero">
+        <div class="hero-media skeleton" id="heroMedia"></div>
+        <div class="hero-content">
+          <h1 id="heroTitle">Loading latest Astronomy Picture...</h1>
+          <p id="heroDesc" class="muted">Fetching images from NASA APOD. If the API fails, cached results or local fallbacks will be used.</p>
+          <div class="hero-meta muted" id="heroMeta"></div>
         </div>
       </div>
 
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
-        <h3 style="margin:0">Latest space news</h3>
-        <div id="newsMeta" class="small">Loading…</div>
+      <div class="feed-header">
+        <h2 style="margin:0">Recent APODs</h2>
+        <div class="small" id="feedMeta">Last 8 days</div>
       </div>
 
-      <div id="newsCards" class="cards" style="margin-top:8px"></div>
+      <div class="cards" id="cards"></div>
     </section>
 
     <aside>
       <div class="panel">
-        <h4 style="margin:0 0 8px 0">Upcoming launches</h4>
-        <div id="launchList" class="small">Loading launches…</div>
+        <h4>About OrbitFeed</h4>
+        <p class="small">OrbitFeed shows the Astronomy Picture of the Day (APOD) from NASA with a clean magazine-style layout inspired by MIT Technology Review. Images are cached locally for reliability.</p>
       </div>
 
       <div class="panel">
-        <h4 style="margin:0 0 8px 0">ISS Right Now</h4>
-        <div id="issInfo" class="small">Loading ISS position…</div>
+        <h4>Quick actions</h4>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="openToday" class="btn">Open today's</button>
+          <button id="downloadAll" class="btn">Download images</button>
+        </div>
       </div>
 
       <div class="panel">
-        <h4 style="margin:0 0 8px 0">Status</h4>
-        <div id="statusBox" class="small">Initializing…</div>
+        <h4>Settings</h4>
+        <div class="small">API key (optional):</div>
+        <input id="apiKey" placeholder="NASA API key (optional)" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #eee" />
+        <div style="margin-top:8px" class="small muted">Using <strong>DEMO_KEY</strong> has rate limits. Add your key for higher limits.</div>
       </div>
     </aside>
   </main>
 
-  <footer>Built for reliability • Cached + fallback data • Host on GitHub Pages</footer>
+  <footer>OrbitFeed • Images from NASA APOD • Save & share your favorites</footer>
+
+  <!-- Modal (hidden initially) -->
+  <div id="modal" style="display:none" class="modal" onclick="closeModal(event)">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <div class="media" id="modalMedia"></div>
+      <div class="content">
+        <h3 id="modalTitle"></h3>
+        <p id="modalDate" class="muted"></p>
+        <p id="modalDesc"></p>
+        <p class="muted">Source: <a id="modalLink" class="link" target="_blank" rel="noopener">NASA APOD</a></p>
+        <div style="margin-top:12px;display:flex;gap:8px"><button onclick="closeModal()" class="btn">Close</button><button id="favBtn" class="btn">Save</button></div>
+      </div>
+    </div>
+  </div>
 
 <script>
-/*
-NowInSpace — Reliable client-only version
-Features:
-- NASA APOD (cached)
-- Spaceflight news (primary API) with local backup fallback
-- TheSpaceDevs launches with fallback
-- ISS location (wheretheiss.at) cached short-term
-- localStorage caching with TTL and retry logic
-*/
+// OrbitFeed: single-file app
+// - Fetches last N days of NASA APOD
+// - Caches results in localStorage with TTL
+// - Fallback local data ensures UI always shows something
+// - Magazine-style UI, modal to view full image and explanation
 
-const NASA_API_KEY = 'gs6lRgopzIcyZJVBliOsyXKZnwCEii5w0OBidaVk'; // replace to avoid rate limits
-const NEWS_TTL_MS = 1000 * 60 * 30; // 30 minutes
-const APOD_TTL_MS = 1000 * 60 * 60 * 6; // 6 hours
-const LAUNCH_TTL_MS = 1000 * 60 * 30; // 30 minutes
-const ISS_TTL_MS = 10000; // 10s for ISS (but still cached between intervals)
+const DEMO_KEY = 'DEMO_KEY'; // default
+const CACHE_KEY = 'orbitfeed:apod_cache_v1';
+const CACHE_TTL = 1000 * 60 * 60 * 6; // 6 hours
+const DAYS = 8; // number of days to fetch
 
-const LOCAL_BACKUP_NEWS = [
-  // Minimal local backup to ensure UI never blank (title, summary, url, image, source, publishedAt)
-  { title: "NASA's Webb releases stunning deep-field images", summary: "NASA's James Webb Space Telescope released a set of deep-field images showing early galaxies.", url: "https://www.nasa.gov/", image: "https://via.placeholder.com/600x360?text=Webb", source: "NASA", publishedAt: new Date().toISOString() },
-  { title: "Commercial launch reaches orbit", summary: "A commercial provider successfully places small satellites into orbit.", url: "https://spaceflightnow.com/", image: "https://via.placeholder.com/600x360?text=Launch", source: "SpaceNews", publishedAt: new Date().toISOString() },
-  { title: "New instrument to study Mars atmosphere", summary: "A new instrument will be sent to Mars to study atmospheric composition.", url: "https://www.esa.int/", image: "https://via.placeholder.com/600x360?text=Mars", source: "ESA", publishedAt: new Date().toISOString() }
+// Simple local fallback (small curated set) — ensures UI never blank
+const LOCAL_FALLBACK = [
+  { date: '2025-11-01', title: 'Milky Way over Desert', explanation: 'A long-exposure image of the Milky Way...', url: 'https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/piaxxxx.jpg', hdurl: 'https://via.placeholder.com/1200x800?text=Milky+Way' },
+  { date: '2025-10-28', title: 'Aurora over Earth', explanation: 'Northern lights glowing...', url: 'https://via.placeholder.com/1200x800?text=Aurora', hdurl: 'https://via.placeholder.com/1200x800?text=Aurora' }
 ];
 
-const LOCAL_BACKUP_LAUNCHES = [
-  { name: "Demo Rocket — Demo Mission", net: new Date(Date.now() + 86400000).toISOString(), image: null },
-  { name: "Test Satellite Launch", net: new Date(Date.now() + 3*86400000).toISOString(), image: null }
-];
+// DOM elements
+const heroMedia = document.getElementById('heroMedia');
+const heroTitle = document.getElementById('heroTitle');
+const heroDesc = document.getElementById('heroDesc');
+const heroMeta = document.getElementById('heroMeta');
+const cards = document.getElementById('cards');
+const feedMeta = document.getElementById('feedMeta');
+const qInput = document.getElementById('q');
+const refreshBtn = document.getElementById('refresh');
+const apiKeyInput = document.getElementById('apiKey');
+const openTodayBtn = document.getElementById('openToday');
+const downloadAllBtn = document.getElementById('downloadAll');
 
-// Utils: localStorage cache helpers
-function cacheSet(key, value) {
-  const obj = { ts: Date.now(), v: value };
-  try { localStorage.setItem('nowinspace:' + key, JSON.stringify(obj)); } catch(e){}
-}
-function cacheGet(key, ttlMs=Infinity) {
+let APOD_ITEMS = []; // array of APOD objects
+
+// Utility: safe fetch JSON with timeout
+async function fetchJson(url, opts = {}, timeout = 12000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
   try {
-    const raw = localStorage.getItem('nowinspace:' + key);
+    const res = await fetch(url, { ...opts, signal: controller.signal });
+    clearTimeout(id);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
+  } catch (e) {
+    clearTimeout(id);
+    console.warn('fetchJson failed', url, e && e.message);
+    return null;
+  }
+}
+
+// Cache helpers
+function cacheSet(v) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), v })); } catch (e) { }
+}
+function cacheGet() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
     if (!raw) return null;
     const obj = JSON.parse(raw);
     if (!obj || !obj.ts) return null;
-    if (Date.now() - obj.ts > ttlMs) { localStorage.removeItem('nowinspace:' + key); return null; }
+    if (Date.now() - obj.ts > CACHE_TTL) { localStorage.removeItem(CACHE_KEY); return null; }
     return obj.v;
-  } catch(e){ return null; }
+  } catch (e) { return null; }
 }
 
-// small safe fetch wrapper with retries
-async function fetchWithRetries(url, opts={}, attempts=2, delayMs=800) {
-  for (let i=0;i<attempts;i++){
-    try {
-      const res = await fetch(url, opts);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const ct = res.headers.get('content-type') || '';
-      if (ct.includes('application/json')) return await res.json();
-      return await res.text();
-    } catch(e) {
-      console.warn('fetch error', url, e && e.message);
-      if (i < attempts -1) await new Promise(r=>setTimeout(r, delayMs));
-    }
+// Build NASA APOD URL to fetch range
+function buildApodRangeUrl(apiKey, startDate, endDate) {
+  return `https://api.nasa.gov/planetary/apod?api_key=${encodeURIComponent(apiKey)}&start_date=${startDate}&end_date=${endDate}`;
+}
+
+function formatDate(d) {
+  const yyyy = d.getFullYear(); const mm = String(d.getMonth() + 1).padStart(2, '0'); const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+// Fetch last N days of APOD (returns array sorted descending by date)
+async function fetchApodRange(apiKey, days) {
+  // compute start & end
+  const end = new Date();
+  const start = new Date(); start.setDate(end.getDate() - (days - 1));
+  const url = buildApodRangeUrl(apiKey, formatDate(start), formatDate(end));
+  const data = await fetchJson(url);
+  if (!data) return null;
+  // API returns array when start_date is used; ensure sorted newest-first
+  const arr = Array.isArray(data) ? data : [data];
+  arr.sort((a, b) => new Date(b.date) - new Date(a.date));
+  return arr;
+}
+
+// Render functions
+function renderHero(item) {
+  if (!item) return;
+  heroMedia.classList.remove('skeleton');
+  heroMedia.innerHTML = '';
+  // handle video
+  if (item.media_type === 'video') {
+    const iframe = document.createElement('iframe');
+    iframe.src = item.url; iframe.style.width = '100%'; iframe.style.height = '100%'; iframe.frameBorder = 0; iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+    heroMedia.appendChild(iframe);
+  } else {
+    const img = document.createElement('img');
+    img.src = item.hdurl || item.url; img.alt = item.title || 'APOD';
+    heroMedia.appendChild(img);
   }
-  return null;
+  heroTitle.textContent = item.title || 'Astronomy Picture';
+  heroDesc.textContent = (item.explanation || '').slice(0, 220) + ((item.explanation || '').length > 220 ? '…' : '');
+  heroMeta.innerHTML = `${item.date || ''} &nbsp; · &nbsp; <a href="${item.url}" target="_blank" rel="noopener" class="link">View on NASA</a>`;
 }
 
-/* APOD (NASA) */
-async function loadAPOD(force=false) {
-  const heroMedia = document.getElementById('heroMedia');
-  const heroTitle = document.getElementById('heroTitle');
-  const heroDesc = document.getElementById('heroDesc');
+function renderCards(items) {
+  cards.innerHTML = '';
+  items.forEach(item => {
+    const card = document.createElement('article'); card.className = 'card';
+    const thumb = document.createElement('div'); thumb.className = 'thumb';
+    const img = document.createElement('img'); img.src = item.url || item.hdurl || 'https://via.placeholder.com/600x360?text=Space'; img.alt = item.title || 'APOD'; img.loading = 'lazy';
+    thumb.appendChild(img);
+    const meta = document.createElement('div'); meta.className = 'meta';
+    const h3 = document.createElement('h3'); h3.textContent = item.title || 'Untitled';
+    const p = document.createElement('p'); p.textContent = (item.explanation || '').slice(0, 140) + ((item.explanation||'').length>140 ? '…' : '');
+    const mline = document.createElement('div'); mline.className = 'metaLine'; mline.innerHTML = `${item.date || ''} &nbsp; · &nbsp; <a class="link" href="#" onclick="openModal('${encodeURIComponent(item.date || '')}')">Read</a>`;
+    meta.appendChild(h3); meta.appendChild(p); meta.appendChild(mline);
+    card.appendChild(thumb); card.appendChild(meta);
+    cards.appendChild(card);
+
+    // clicking card opens modal for that date
+    card.addEventListener('click', (e) => { if (e.target.tagName.toLowerCase() !== 'a') openModal(item.date); });
+  });
+}
+
+// Modal behavior
+function openModal(dateEncoded) {
+  const date = typeof dateEncoded === 'string' ? decodeURIComponent(dateEncoded) : dateEncoded;
+  const item = APOD_ITEMS.find(x => x.date === date);
+  if (!item) return;
+  document.getElementById('modal').style.display = 'flex';
+  const modalMedia = document.getElementById('modalMedia');
+  modalMedia.innerHTML = '';
+  if (item.media_type === 'video') {
+    const iframe = document.createElement('iframe'); iframe.src = item.url; iframe.style.width='100%'; iframe.style.height='100%'; iframe.frameBorder=0; iframe.allow='encrypted-media; fullscreen';
+    modalMedia.appendChild(iframe);
+  } else {
+    const img = document.createElement('img'); img.src = item.hdurl || item.url; img.alt = item.title || 'APOD'; img.style.width='100%'; img.style.height='100%'; img.style.objectFit='contain';
+    modalMedia.appendChild(img);
+  }
+  document.getElementById('modalTitle').textContent = item.title || '';
+  document.getElementById('modalDate').textContent = item.date || '';
+  document.getElementById('modalDesc').textContent = item.explanation || '';
+  const link = document.getElementById('modalLink'); link.href = item.url || '#'; link.textContent = 'NASA APOD';
+}
+function closeModal(evt) { if (evt) { if (evt.target.id !== 'modal') return; } document.getElementById('modal').style.display = 'none'; }
+
+// Simple download images (zip is heavy; we'll open images in new tabs sequentially)
+async function downloadAllImages() {
+  for (const it of APOD_ITEMS) {
+    const u = it.hdurl || it.url;
+    if (!u) continue;
+    window.open(u, '_blank');
+    await new Promise(r => setTimeout(r, 300));
+  }
+}
+
+// Main load flow
+async function loadOrbitFeed(force = false) {
   // try cache
   if (!force) {
-    const cached = cacheGet('apod', APOD_TTL_MS);
-    if (cached) {
-      showAPOD(cached);
-      return cached;
+    const cached = cacheGet();
+    if (cached && Array.isArray(cached) && cached.length) {
+      APOD_ITEMS = cached;
+      renderHero(APOD_ITEMS[0]);
+      renderCards(APOD_ITEMS.slice(1));
+      feedMeta.textContent = `Showing ${APOD_ITEMS.length} days (cached)`;
+      return;
     }
   }
 
-  const url = `https://api.nasa.gov/planetary/apod?api_key=${encodeURIComponent(NASA_API_KEY)}`;
-  const data = await fetchWithRetries(url, {}, 2, 900);
-  if (!data) {
-    // show cached if any or fallback
-    const cached = cacheGet('apod', Infinity);
-    if (cached) { showAPOD(cached); return cached; }
-    heroMedia.className = 'media'; heroMedia.innerHTML = '<div style="padding:20px">APOD unavailable</div>';
-    heroTitle.textContent = 'Astronomy Picture';
-    heroDesc.textContent = 'Could not fetch APOD.';
-    return null;
-  }
-  cacheSet('apod', data);
-  showAPOD(data);
-  return data;
-}
-function showAPOD(data) {
-  const heroMedia = document.getElementById('heroMedia');
-  const heroTitle = document.getElementById('heroTitle');
-  const heroDesc = document.getElementById('heroDesc');
-  heroMedia.className = 'media';
-  if (data.media_type === 'video') {
-    heroMedia.innerHTML = `<iframe src="${data.url}" style="width:100%;height:100%;border:0" title="APOD video" frameborder="0" allowfullscreen></iframe>`;
-  } else {
-    const img = document.createElement('img'); img.src = data.url; img.alt = data.title || 'APOD';
-    heroMedia.innerHTML = ''; heroMedia.appendChild(img);
-  }
-  heroTitle.textContent = data.title || 'Astronomy Picture';
-  heroDesc.textContent = (data.explanation || '').slice(0, 220) + ((data.explanation||'').length>220 ? '…' : '');
-}
-
-/* News: primary API (Spaceflight) with backup */
-async function loadNews(force=false) {
-  const meta = document.getElementById('newsMeta');
-  meta.textContent = 'Loading news…';
-  if (!force) {
-    const cached = cacheGet('news', NEWS_TTL_MS);
-    if (cached) { NEWS_ITEMS = cached; renderNewsCards(NEWS_ITEMS); meta.textContent = `Showing ${NEWS_ITEMS.length} articles (cached)`; return cached; }
+  // determine API key
+  const userKey = (document.getElementById('apiKey').value || '').trim() || DEMO_KEY;
+  const arr = await fetchApodRange(userKey, DAYS);
+  if (arr && Array.isArray(arr) && arr.length) {
+    APOD_ITEMS = arr;
+    cacheSet(APOD_ITEMS);
+    renderHero(APOD_ITEMS[0]);
+    renderCards(APOD_ITEMS.slice(1));
+    feedMeta.textContent = `Showing ${APOD_ITEMS.length} days`;
+    return;
   }
 
-  const endpoint = 'https://api.spaceflightnewsapi.net/v3/articles?_limit=12';
-  const data = await fetchWithRetries(endpoint, {}, 2, 800);
-  if (data && Array.isArray(data) && data.length>0) {
-    const items = data.map(it => ({
-      title: it.title || it.name || '',
-      summary: it.summary || it.summary || '',
-      url: it.url || it.link || '',
-      image: it.imageUrl || it.image_url || it.image || '',
-      source: it.newsSite || it.source || '',
-      publishedAt: it.publishedAt || it.published_at || ''
-    }));
-    NEWS_ITEMS = items;
-    cacheSet('news', items);
-    renderNewsCards(items);
-    meta.textContent = `Showing ${items.length} articles`;
-    return items;
-  }
-
-  // fallback: local backup
-  console.warn('Spaceflight API failed — using local backup');
-  NEWS_ITEMS = LOCAL_BACKUP_NEWS;
-  cacheSet('news', NEWS_ITEMS);
-  renderNewsCards(NEWS_ITEMS);
-  meta.textContent = `Showing ${NEWS_ITEMS.length} articles (backup)`;
-  return NEWS_ITEMS;
+  // fallback: use local fallback to avoid blank UI
+  APOD_ITEMS = LOCAL_FALLBACK;
+  renderHero(APOD_ITEMS[0]);
+  renderCards(APOD_ITEMS.slice(1));
+  feedMeta.textContent = `Showing fallback items`;
 }
 
-function renderNewsCards(items) {
-  const container = document.getElementById('newsCards');
-  container.innerHTML = '';
-  if (!items || !items.length) { container.innerHTML = '<div class="small">No news available</div>'; return; }
-  items.forEach(it => {
-    const card = document.createElement('article'); card.className='card';
-    const thumb = document.createElement('div'); thumb.className='thumb';
-    const img = document.createElement('img'); img.src = it.image || it.imageUrl || 'https://via.placeholder.com/600x360?text=Space'; img.alt = it.title || 'img';
-    thumb.appendChild(img);
-    const info = document.createElement('div'); info.className='info';
-    const h3 = document.createElement('h3'); h3.textContent = it.title || '';
-    const p = document.createElement('p'); p.textContent = (it.summary||'').replace(/<[^>]+>/g,'').slice(0,160) + ((it.summary||'').length>160 ? '…' : '');
-    const meta = document.createElement('div'); meta.className='small';
-    const d = new Date(it.publishedAt || it.pubDate || Date.now());
-    meta.innerHTML = `${it.source || ''} ${isNaN(d)?'':'· ' + d.toLocaleDateString()} &nbsp; <a href="${it.url||it.link||'#'}" class="small" target="_blank" rel="noopener">Read source</a>`;
-    info.appendChild(h3); info.appendChild(p); info.appendChild(meta);
-    card.appendChild(thumb); card.appendChild(info);
-    container.appendChild(card);
-  });
-}
-
-/* Launches with fallback */
-async function loadLaunches(force=false) {
-  const cached = !force ? cacheGet('launches', LAUNCH_TTL_MS) : null;
-  if (cached) { renderLaunches(cached); return cached; }
-  const endpoint = 'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=6&mode=detailed';
-  const data = await fetchWithRetries(endpoint, {}, 2, 1000);
-  if (data && data.results && data.results.length) {
-    cacheSet('launches', data.results);
-    renderLaunches(data.results);
-    return data.results;
-  }
-  console.warn('Launches API failed — using backup');
-  cacheSet('launches', LOCAL_BACKUP_LAUNCHES);
-  renderLaunches(LOCAL_BACKUP_LAUNCHES);
-  return LOCAL_BACKUP_LAUNCHES;
-}
-function renderLaunches(items) {
-  const list = document.getElementById('launchList'); list.innerHTML = '';
-  items.forEach(ln => {
-    const el = document.createElement('div'); el.style.marginBottom='12px';
-    const name = document.createElement('div'); name.textContent = ln.name || ln.mission || 'Unnamed'; name.style.fontWeight=600;
-    const t = new Date(ln.net || ln.window_start || ln.date || Date.now());
-    const dt = document.createElement('div'); dt.className='small'; dt.textContent = isNaN(t)?'TBA':t.toLocaleString();
-    const countdown = document.createElement('div'); countdown.className='small'; countdown.style.fontWeight=600; countdown.style.color='var(--accent)';
-    countdown.setAttribute('data-net', ln.net || ln.window_start || ln.date || '');
-    updateCountdownElement(countdown);
-    el.appendChild(name); el.appendChild(dt); el.appendChild(countdown);
-    list.appendChild(el);
-  });
-  if (!window._nowinspace_launch_tick) {
-    window._nowinspace_launch_tick = setInterval(()=> document.querySelectorAll('[data-net]').forEach(updateCountdownElement), 1000);
-  }
-}
-function updateCountdownElement(el) {
-  const net = el.getAttribute('data-net'); if(!net) { el.textContent='TBA'; return; }
-  const diff = new Date(net) - new Date();
-  if (isNaN(diff)) { el.textContent='TBA'; return; }
-  if (diff <= 0) { el.textContent='Launched'; return; }
-  const s = Math.floor(diff/1000), days=Math.floor(s/86400), hrs=Math.floor((s%86400)/3600), mins=Math.floor((s%3600)/60), secs=s%60;
-  el.textContent = (days>0?days+'d ':'') + String(hrs).padStart(2,'0') + ':' + String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
-}
-
-/* ISS position (short-term cached) */
-async function loadISS(force=false) {
-  const cached = !force ? cacheGet('iss', ISS_TTL_MS) : null;
-  const info = document.getElementById('issInfo');
-  if (cached) { info.innerHTML = formatISS(cached); return cached; }
-  const url = 'https://api.wheretheiss.at/v1/satellites/25544';
-  const data = await fetchWithRetries(url, {}, 2, 800);
-  if (data) { cacheSet('iss', data); info.innerHTML = formatISS(data); return data; }
-  info.textContent = 'ISS unavailable';
-  return null;
-}
-function formatISS(d) {
-  return `Latitude: ${d.latitude.toFixed(2)}°, Longitude: ${d.longitude.toFixed(2)}° <br> Alt: ${d.altitude?d.altitude.toFixed(1)+' km':''} • Vel: ${d.velocity?d.velocity.toFixed(1)+' km/h':''}`;
-}
-
-/* Controls and init */
-let NEWS_ITEMS = [];
-
-document.getElementById('refreshBtn').addEventListener('click', () => {
-  document.getElementById('statusBox').textContent = 'Soft refresh… (will use cache if fresh)';
-  loadAll(false);
-});
-document.getElementById('forceRefreshBtn').addEventListener('click', () => {
-  document.getElementById('statusBox').textContent = 'Force refresh — ignoring caches';
-  // clear caches
-  ['apod','news','launches','iss'].forEach(k => localStorage.removeItem('nowinspace:' + k));
-  loadAll(true);
+// Search functionality
+qInput.addEventListener('input', () => {
+  const q = qInput.value.trim().toLowerCase();
+  if (!q) { renderCards(APOD_ITEMS.slice(1)); feedMeta.textContent = `Showing ${APOD_ITEMS.length} days`; return; }
+  const filtered = APOD_ITEMS.filter(it => (it.title + ' ' + (it.explanation||'')).toLowerCase().includes(q));
+  renderCards(filtered.slice(1));
+  feedMeta.textContent = `Filtered: ${filtered.length} results`;
 });
 
-async function loadAll(force=false) {
-  document.getElementById('statusBox').textContent = 'Loading data…';
-  try {
-    await Promise.all([ loadAPOD(force), loadNews(force), loadLaunches(force), loadISS(force) ]);
-    document.getElementById('statusBox').textContent = 'Loaded (cached + fallback enabled)';
-  } catch(e) {
-    console.warn('loadAll error', e);
-    document.getElementById('statusBox').textContent = 'Some data failed to load — using cached/fallback data if available';
-  }
-}
+// Button hookups
+refreshBtn.addEventListener('click', () => loadOrbitFeed(true));
+openTodayBtn.addEventListener('click', () => { if (APOD_ITEMS.length) openModal(APOD_ITEMS[0].date); });
+downloadAllBtn.addEventListener('click', downloadAllImages);
 
-// Initial load
-loadAll(false);
+// Initial run
+loadOrbitFeed(false);
 
-// Periodic background refresh: attempt to refresh news every 15 minutes (soft — preserves cached TTL logic)
-setInterval(() => { loadNews(false); }, 1000 * 60 * 15);
+// Expose modal open for links
+window.openModal = openModal; window.closeModal = closeModal;
+
 </script>
 </body>
 </html>
