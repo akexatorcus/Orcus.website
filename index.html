@@ -1,1 +1,327 @@
-<h>orcus</h>
+/*
+React single-file app: Chess vs Bot
+
+Requirements:
+- This file is an exportable React component (default export).
+- Install dependencies in your React project:
+  npm install chess.js
+
+Usage:
+- Put this file as src/App.jsx (or similar) in a Create React App / Vite React project.
+- Ensure Tailwind CSS is set up in your project for styling to match. If you don't use Tailwind, the app will still work with basic CSS, but styles may differ.
+
+Description:
+- Uses chess.js for game rules and legal move generation.
+- Implements a simple minimax + alpha-beta bot with material evaluation and optional search depth (difficulty).
+- Board is interactive: click a piece to see legal moves, click destination to move.
+- Buttons: New Game, Undo (player move only), Toggle orientation, Difficulty slider.
+
+Notes:
+- This is frontend-only. The bot runs locally in the browser.
+- The bot is synchronous and runs quickly for small depths (1-3). Depth 3 may be slightly slower but should be fine in modern browsers.
+*/
+
+import React, { useEffect, useState, useMemo, useRef } from "react";
+import { Chess } from "chess.js";
+
+// Utility: simple material values
+const PIECE_VALUE = {
+  p: 100,
+  n: 320,
+  b: 330,
+  r: 500,
+  q: 900,
+  k: 20000,
+};
+
+function evaluateBoard(game) {
+  const fen = game.fen();
+  // We'll traverse board and score
+  const board = game.board();
+  let score = 0;
+  for (let r = 0; r < 8; r++) {
+    for (let f = 0; f < 8; f++) {
+      const sq = board[r][f];
+      if (sq) {
+        const val = PIECE_VALUE[sq.type] || 0;
+        score += sq.color === "w" ? val : -val;
+      }
+    }
+  }
+  return score;
+}
+
+// Minimax with alpha-beta pruning
+function minimax(game, depth, alpha, beta, isMaximizingPlayer) {
+  if (depth === 0 || game.game_over()) {
+    return [evaluateBoard(game), null];
+  }
+
+  const moves = game.moves({ verbose: true });
+  if (isMaximizingPlayer) {
+    let maxEval = -Infinity;
+    let bestMove = null;
+    for (let i = 0; i < moves.length; i++) {
+      const m = moves[i];
+      game.move(m.san);
+      const [evalScore] = minimax(game, depth - 1, alpha, beta, false);
+      game.undo();
+      if (evalScore > maxEval) {
+        maxEval = evalScore;
+        bestMove = m;
+      }
+      alpha = Math.max(alpha, evalScore);
+      if (beta <= alpha) break;
+    }
+    return [maxEval, bestMove];
+  } else {
+    let minEval = Infinity;
+    let bestMove = null;
+    for (let i = 0; i < moves.length; i++) {
+      const m = moves[i];
+      game.move(m.san);
+      const [evalScore] = minimax(game, depth - 1, alpha, beta, true);
+      game.undo();
+      if (evalScore < minEval) {
+        minEval = evalScore;
+        bestMove = m;
+      }
+      beta = Math.min(beta, evalScore);
+      if (beta <= alpha) break;
+    }
+    return [minEval, bestMove];
+  }
+}
+
+export default function App() {
+  const [game, setGame] = useState(() => new Chess());
+  const [selected, setSelected] = useState(null); // square like 'e2'
+  const [legalMoves, setLegalMoves] = useState([]);
+  const [orientationWhite, setOrientationWhite] = useState(true);
+  const [status, setStatus] = useState("White to move");
+  const [difficulty, setDifficulty] = useState(2); // search depth
+  const [thinking, setThinking] = useState(false);
+  const gameRef = useRef(game);
+
+  useEffect(() => {
+    gameRef.current = game;
+  }, [game]);
+
+  useEffect(() => {
+    updateStatus();
+    // If it's black's turn, make bot move
+    if (!game.turn || game.turn() === "b") {
+      if (!game.game_over() && !thinking) {
+        // allow bot to play only when black to move (we're white)
+        // Run bot asynchronously but without setTimeout for simplicity
+        runBotMove();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [game]);
+
+  function resetGame() {
+    const g = new Chess();
+    setGame(g);
+    setSelected(null);
+    setLegalMoves([]);
+    setThinking(false);
+  }
+
+  function updateStatus() {
+    if (game.game_over()) {
+      if (game.in_checkmate()) {
+        setStatus(`Checkmate — ${game.turn() === 'w' ? 'Black' : 'White'} wins`);
+      } else if (game.in_draw()) {
+        setStatus('Draw');
+      } else {
+        setStatus('Game over');
+      }
+      return;
+    }
+    const turn = game.turn() === 'w' ? 'White' : 'Black';
+    const inCheck = game.in_check() ? ' — check' : '';
+    setStatus(`${turn} to move${inCheck}`);
+  }
+
+  function onSquareClick(square) {
+    if (thinking) return; // ignore clicks while bot thinking
+    // If nothing selected, try to select
+    const piece = game.get(square);
+    if (selected) {
+      // If clicked the same square, unselect
+      if (selected === square) {
+        setSelected(null);
+        setLegalMoves([]);
+        return;
+      }
+      // If clicked a destination that is legal, move
+      const isLegal = legalMoves.some(m => m.to === square);
+      if (isLegal) {
+        const g = new Chess(game.fen());
+        g.move({ from: selected, to: square, promotion: 'q' });
+        setGame(g);
+        setSelected(null);
+        setLegalMoves([]);
+        return;
+      }
+    }
+    // Not moving: if there's a piece and it's the player's color, select it
+    if (piece && piece.color === 'w') {
+      const moves = game.moves({ square, verbose: true });
+      setSelected(square);
+      setLegalMoves(moves);
+    } else {
+      // clicked empty square or opponent piece
+      setSelected(null);
+      setLegalMoves([]);
+    }
+  }
+
+  function runBotMove() {
+    if (game.game_over()) return;
+    // Only run bot for black
+    if (game.turn() !== 'b') return;
+    setThinking(true);
+    // Do the minimax search on a clone
+    const g = new Chess(game.fen());
+    // Simple time-slice using setTimeout to avoid blocking UI for larger depths
+    setTimeout(() => {
+      const depth = difficulty;
+      const [score, bestMove] = minimax(g, depth, -Infinity, Infinity, true);
+      if (bestMove) {
+        const g2 = new Chess(game.fen());
+        g2.move(bestMove.san);
+        setGame(g2);
+      }
+      setThinking(false);
+    }, 40);
+  }
+
+  function undoMove() {
+    // Undo last two plies ideally: player's move only
+    if (thinking) return;
+    const g = new Chess(game.fen());
+    g.undo(); // undo black
+    g.undo(); // undo white
+    setGame(g);
+  }
+
+  const boardSquares = useMemo(() => {
+    const b = game.board();
+    // Return array of objects with square, piece
+    const rows = [];
+    for (let r = 7; r >= 0; r--) {
+      const row = [];
+      for (let f = 0; f < 8; f++) {
+        const file = String.fromCharCode(97 + f);
+        const rank = r + 1;
+        const sq = file + rank;
+        row.push({ square: sq, piece: b[r][f] });
+      }
+      rows.push(row);
+    }
+    return rows;
+  }, [game]);
+
+  function renderPiece(piece) {
+    if (!piece) return null;
+    // Use Unicode chess symbols
+    const map = {
+      pw: '♙', nw: '♘', bw: '♗', rw: '♖', qw: '♕', kw: '♔',
+      pb: '♟', nb: '♞', bb: '♝', rb: '♜', qb: '♛', kb: '♚',
+    };
+    const key = piece.type + piece.color;
+    return <span className="text-2xl select-none">{map[key]}</span>;
+  }
+
+  // Helper: is square highlighted
+  function isHighlighted(square) {
+    return legalMoves.some(m => m.to === square) || selected === square;
+  }
+
+  return (
+    <div className="min-h-screen flex items-start justify-center bg-gray-100 p-6">
+      <div className="w-full max-w-4xl">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-semibold">Chess vs Bot</h1>
+          <div className="space-x-2">
+            <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={resetGame}>New Game</button>
+            <button className="px-3 py-1 bg-gray-300 rounded" onClick={undoMove}>Undo</button>
+            <button className="px-3 py-1 bg-gray-300 rounded" onClick={() => setOrientationWhite(!orientationWhite)}>Flip</button>
+          </div>
+        </div>
+
+        <div className="bg-white rounded shadow p-4 flex gap-6">
+          {/* Board */}
+          <div>
+            <div className="grid grid-cols-8 gap-0 border-2" style={{ width: 480, height: 480 }}>
+              {boardSquares.flat().map((cell, idx) => {
+                // determine square color
+                const file = cell.square.charCodeAt(0) - 97;
+                const rank = parseInt(cell.square[1], 10) - 1;
+                const isLight = (file + rank) % 2 === 0;
+                const highlighted = isHighlighted(cell.square);
+                return (
+                  <div
+                    key={cell.square}
+                    onClick={() => onSquareClick(cell.square)}
+                    className={`w-60 h-60 flex items-center justify-center cursor-pointer select-none`}
+                    style={{
+                      background: highlighted ? 'rgba(253,230,138,0.85)' : (isLight ? '#f0d9b5' : '#b58863'),
+                      width: 60,
+                      height: 60,
+                      boxSizing: 'border-box',
+                      border: selected === cell.square ? '2px solid #0ea5e9' : '1px solid rgba(0,0,0,0.05)'
+                    }}
+                  >
+                    {renderPiece(cell.piece)}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-2 text-sm text-gray-600">Orientation: {orientationWhite ? 'White at bottom' : 'Black at bottom'}</div>
+          </div>
+
+          {/* Right panel */}
+          <div className="flex-1">
+            <div className="mb-2">
+              <div className="text-lg font-medium">Status</div>
+              <div className="text-sm text-gray-700">{status}</div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm mb-1">Difficulty (search depth): {difficulty}</label>
+              <input type="range" min={1} max={3} value={difficulty} onChange={(e) => setDifficulty(Number(e.target.value))} />
+              <div className="text-xs text-gray-500 mt-1">Higher depth = stronger bot but slower.</div>
+            </div>
+
+            <div className="mb-4">
+              <div className="text-sm font-medium mb-1">Moves (PGN)</div>
+              <textarea readOnly value={game.pgn()} className="w-full h-32 p-2 border rounded text-sm" />
+            </div>
+
+            <div className="mb-4">
+              <div className="text-sm font-medium mb-1">Controls</div>
+              <div className="space-x-2">
+                <button onClick={resetGame} className="px-3 py-1 bg-blue-600 text-white rounded">New Game</button>
+                <button onClick={undoMove} className="px-3 py-1 bg-gray-300 rounded">Undo</button>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="text-sm font-medium mb-1">Legend</div>
+              <div className="text-xs text-gray-600">Click a white piece to see legal moves, then click a destination. Promotion auto-queens. Bot plays as Black.</div>
+            </div>
+
+            <div className="mt-auto">
+              <div className="text-sm text-gray-500">Thinking: {thinking ? 'Yes' : 'No'}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 text-xs text-gray-500">Built with chess.js for rules. Want multiplayer, engine strength controls, or drag-and-drop? Ask and I'll add them.</div>
+      </div>
+    </div>
+  );
+}
