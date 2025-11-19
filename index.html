@@ -3,405 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tech Horizon | Curated Tech News</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'tech-black': '#121212',
-                        'tech-red': '#F93822', // MIT Tech Review inspired accent
-                        'tech-gray': '#F4F4F4',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Merriweather', 'serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    }
-                }
-            }
-        }
-    </script>
-
+    <title>Orcus4AI | The Future of Intelligence</title>
     <style>
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --font-serif: 'Georgia', serif;
+            --color-bg: #0a0a0a;
+            --color-card-bg: #151515;
+            --color-text-main: #ffffff;
+            --color-text-muted: #a0a0a0;
+            --color-accent: #00f2ea; /* AI Cyan */
+            --spacing-md: 20px;
+            --card-radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text-main);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- HEADER --- */
+        header {
+            padding: 20px;
+            background: rgba(10, 10, 10, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .brand span { color: var(--color-accent); }
+        
+        .status-indicator {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot {
             width: 8px;
+            height: 8px;
+            background-color: #0f0;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* --- NEWS FEED CONTAINER --- */
+        .container {
+            max-width: 600px; /* Mobile-focused width like Instagram/TikTok feeds */
+            margin: 0 auto;
+            padding: var(--spacing-md);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #888; 
+
+        /* --- CARD DESIGN (MIT TECH REVIEW STYLE) --- */
+        .news-card {
+            position: relative;
+            background-color: var(--color-card-bg);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .news-card:hover { transform: translateY(-5px); }
+
+        /* Image Container with Overlay */
+        .card-image-container {
+            position: relative;
+            height: 350px; /* Tall, immersive image */
+            width: 100%;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.8);
+        }
+
+        /* Gradient Overlay for Text Readability */
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, #000000 10%, rgba(0,0,0,0.6) 50%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 25px;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--color-accent);
+        }
+
+        .card-source {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 8px;
             border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555; 
+            color: #fff;
         }
 
-        .article-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .article-card:hover {
-            transform: translateY(-2px);
+        .card-title {
+            font-family: var(--font-main); /* Clean sans-serif headers */
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #fff;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* Loading Animation */
-        .shimmer {
-            background: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
-            background-size: 1000px 100%;
-            animation: shimmer 2s infinite linear;
+        /* --- BRIEF NOTE SECTION --- */
+        .card-body {
+            padding: 25px;
+            background: #111;
+            border-top: 1px solid #222;
         }
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
+
+        .brief-note-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #555;
+            margin-bottom: 10px;
+            display: block;
         }
+
+        .bullet-points {
+            list-style: none;
+        }
+
+        .bullet-points li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            color: #ddd;
+            font-family: var(--font-serif); /* Serif for reading text */
+        }
+
+        .bullet-points li::before {
+            content: "•";
+            color: var(--color-accent);
+            position: absolute;
+            left: 0;
+            top: 0px;
+            font-size: 1.2rem;
+        }
+
+        .read-more-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+            background: #222;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .read-more-btn:hover { background: #333; }
+        
+        .timestamp {
+            display: block;
+            text-align: right;
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* Loader */
+        #loader { text-align: center; padding: 50px; color: var(--color-accent); }
     </style>
 </head>
-<body class="bg-white text-tech-black font-sans antialiased">
+<body>
 
-    <!-- Top Bar -->
-    <header class="border-b-4 border-tech-black sticky top-0 z-50 bg-white">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Mobile Menu Button -->
-                <button class="lg:hidden p-2" id="mobile-menu-btn">
-                    <i data-lucide="menu" class="w-6 h-6"></i>
-                </button>
-
-                <!-- Logo -->
-                <div class="flex-shrink-0 flex items-center space-x-2">
-                    <div class="bg-tech-black text-white font-bold font-mono px-2 py-1 text-xl tracking-tighter">TH</div>
-                    <span class="font-serif font-black text-xl sm:text-2xl tracking-tight hidden sm:block">TECH HORIZON</span>
-                </div>
-
-                <!-- Desktop Nav -->
-                <nav class="hidden lg:flex space-x-8">
-                    <a href="#" class="font-mono text-sm font-bold hover:text-tech-red uppercase tracking-wider" onclick="filterNews('all')">All</a>
-                    <a href="#" class="font-mono text-sm font-bold hover:text-tech-red uppercase tracking-wider" onclick="filterNews('AI')">AI</a>
-                    <a href="#" class="font-mono text-sm font-bold hover:text-tech-red uppercase tracking-wider" onclick="filterNews('Biotech')">Biotech</a>
-                    <a href="#" class="font-mono text-sm font-bold hover:text-tech-red uppercase tracking-wider" onclick="filterNews('Computing')">Computing</a>
-                    <a href="#" class="font-mono text-sm font-bold hover:text-tech-red uppercase tracking-wider" onclick="filterNews('Climate')">Climate</a>
-                </nav>
-
-                <!-- Search/Subscribe -->
-                <div class="flex items-center space-x-4">
-                    <button class="p-2 hover:text-tech-red transition-colors">
-                        <i data-lucide="search" class="w-5 h-5"></i>
-                    </button>
-                    <button class="hidden sm:block bg-tech-red text-white font-bold font-mono text-xs px-4 py-2 hover:bg-black transition-colors uppercase">
-                        Subscribe
-                    </button>
-                </div>
-            </div>
-        </div>
+    <header>
+        <div class="brand">Orcus<span>4AI</span></div>
+        <div class="status-indicator"><div class="dot"></div> Live Feed</div>
     </header>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- Current Date -->
-        <div class="flex items-center justify-between border-b border-gray-200 pb-4 mb-8">
-            <p id="current-date" class="font-mono text-sm text-gray-500 uppercase tracking-widest"></p>
-            <div class="flex items-center space-x-2 text-xs font-mono text-tech-red animate-pulse">
-                <span class="w-2 h-2 bg-tech-red rounded-full"></span>
-                <span>LIVE FEED</span>
-            </div>
-        </div>
-
-        <!-- Loading State -->
-        <div id="loader" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-8 h-96 shimmer"></div>
-            <div class="lg:col-span-4 space-y-4">
-                <div class="h-24 shimmer"></div>
-                <div class="h-24 shimmer"></div>
-                <div class="h-24 shimmer"></div>
-            </div>
-        </div>
-
-        <!-- News Container -->
-        <div id="news-container" class="hidden">
-            <!-- Hero Section (Injected via JS) -->
-            <section id="hero-section" class="mb-16 border-b border-black pb-12"></section>
-
-            <!-- The Latest (Grid) -->
-            <div class="flex items-center mb-8">
-                <h2 class="font-serif font-bold text-3xl mr-4">The Latest</h2>
-                <div class="h-1 bg-black flex-grow"></div>
-            </div>
-            
-            <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-                <!-- Articles injected here -->
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-tech-black text-white py-12 mt-12">
-        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div class="col-span-1">
-                <div class="bg-white text-tech-black font-bold font-mono px-2 py-1 text-xl inline-block mb-4">TH</div>
-                <p class="font-serif text-gray-400 text-sm">Curating the future, today.</p>
-            </div>
-            <div>
-                <h4 class="font-mono font-bold text-sm uppercase mb-4 text-gray-500">Topics</h4>
-                <ul class="space-y-2 text-sm font-sans">
-                    <li><a href="#" class="hover:text-tech-red">Artificial Intelligence</a></li>
-                    <li><a href="#" class="hover:text-tech-red">Biotechnology</a></li>
-                    <li><a href="#" class="hover:text-tech-red">Climate Change</a></li>
-                </ul>
-            </div>
-             <div>
-                <h4 class="font-mono font-bold text-sm uppercase mb-4 text-gray-500">Company</h4>
-                <ul class="space-y-2 text-sm font-sans">
-                    <li><a href="#" class="hover:text-tech-red">About Us</a></li>
-                    <li><a href="#" class="hover:text-tech-red">Advertise</a></li>
-                    <li><a href="#" class="hover:text-tech-red">Careers</a></li>
-                </ul>
-            </div>
-             <div>
-                <h4 class="font-mono font-bold text-sm uppercase mb-4 text-gray-500">Connect</h4>
-                <div class="flex space-x-4">
-                    <i data-lucide="twitter" class="w-5 h-5 hover:text-tech-red cursor-pointer"></i>
-                    <i data-lucide="facebook" class="w-5 h-5 hover:text-tech-red cursor-pointer"></i>
-                    <i data-lucide="linkedin" class="w-5 h-5 hover:text-tech-red cursor-pointer"></i>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <div class="container" id="news-feed">
+        <div id="loader">Initializing Neural Feed...</div>
+    </div>
 
     <script>
-        // --- 1. Configuration & Mock Data ---
-        
-        // In a real app, you would replace MOCK_DATA with an API call to NewsAPI, GNews, or Mediastack.
-        // Example: const API_URL = 'https://newsapi.org/v2/top-headlines?category=technology&apiKey=YOUR_KEY';
-        
-        const MOCK_DATA = [
+        // --- CONFIGURATION ---
+        // 1. Get a free API Key from https://gnews.io/
+        // 2. Replace 'YOUR_API_KEY_HERE' below. 
+        // Note: If you leave it as is, it will show MOCK DATA so you can see the design immediately.
+        const API_KEY = 'YOUR_API_KEY_HERE'; 
+        const USE_MOCK_DATA = true; // Set to false once you have a real key
+
+        const newsContainer = document.getElementById('news-feed');
+
+        // --- MOCK DATA GENERATOR (For Demo) ---
+        const mockNews = [
             {
-                id: 1,
-                title: "The AI that can smell: Google's new olfactory network maps molecules to odors",
-                summary: "Researchers have created a principal odor map that allows computers to predict how a molecule will smell, potentially digitizing scent.",
-                category: "AI",
-                author: "Melissa Heikkilä",
-                source: "DeepMind Research",
-                url: "https://deepmind.google/discover/",
-                image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1200",
-                featured: true,
-                date: "2 hours ago"
+                title: "OpenAI Announces GPT-5 with 'Human-Level' Reasoning Capabilities",
+                description: "The new model demonstrates unprecedented problem-solving skills. Early benchmarks show a 40% increase in coding accuracy. Experts are debating the safety implications of this rapid advancement.",
+                image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1000&auto=format&fit=crop",
+                source: "TechCrunch",
+                url: "#",
+                publishedAt: new Date().toISOString()
             },
             {
-                id: 2,
-                title: "CRISPR 2.0: The next generation of gene editing is here",
-                summary: "New techniques are making gene editing more precise and versatile than ever before, opening doors to curing genetic diseases.",
-                category: "Biotech",
-                author: "Antonio Regalado",
-                source: "Nature Biotechnology",
-                url: "https://www.nature.com/nbt/",
-                image: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&q=80&w=800",
-                featured: false,
-                date: "4 hours ago"
+                title: "NVIDIA Reveals New Blackwell Chips for AI Training",
+                description: "NVIDIA's latest GPU architecture promises 30x faster inference speeds. Major cloud providers have already pre-ordered the first batch. This could significantly reduce the cost of training large language models.",
+                image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop",
+                source: "The Verge",
+                url: "#",
+                publishedAt: new Date().toISOString()
             },
             {
-                id: 3,
-                title: "Why we need to rethink carbon capture immediately",
-                summary: "Direct air capture is expensive and energy-intensive. New thermodynamic approaches might solve the efficiency puzzle.",
-                category: "Climate",
-                author: "James Temple",
-                source: "Climate Change News",
-                url: "https://www.climatechangenews.com/",
-                image: "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&q=80&w=800",
-                featured: false,
-                date: "6 hours ago"
-            },
-            {
-                id: 4,
-                title: "The quantum internet is getting closer to reality",
-                summary: "Physicists have successfully teleported quantum information across a metropolitan network, paving the way for unhackable comms.",
-                category: "Computing",
-                author: "Chen Ly",
-                source: "Phys.org",
-                url: "https://phys.org/",
-                image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=800",
-                featured: false,
-                date: "12 hours ago"
-            },
-            {
-                id: 5,
-                title: "Electric planes are finally taking off for short hauls",
-                summary: "Battery density has improved enough to make regional electric flights commercially viable by 2026.",
-                category: "Climate",
-                author: "Casey Crownhart",
-                source: "Aviation Week",
-                url: "https://aviationweek.com/",
-                image: "https://images.unsplash.com/photo-1483304528321-0674f0040030?auto=format&fit=crop&q=80&w=800",
-                featured: false,
-                date: "1 day ago"
-            },
-            {
-                id: 6,
-                title: "Python overtakes C as the most popular language for embedded systems",
-                summary: "MicroPython's rise signals a shift in how hardware is programmed, favoring speed of development over raw cycle efficiency.",
-                category: "Computing",
-                author: "Harry Guinness",
-                source: "IEEE Spectrum",
-                url: "https://spectrum.ieee.org/",
-                image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=800",
-                featured: false,
-                date: "1 day ago"
-            },
-            {
-                id: 7,
-                title: "Generative AI in Medicine: A double-edged sword?",
-                summary: "While LLMs can diagnose rare diseases, hallucination risks remain a critical barrier to FDA approval.",
-                category: "AI",
-                author: "Will Douglas Heaven",
-                source: "The Lancet Digital Health",
-                url: "https://www.thelancet.com/digital-health",
-                image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800",
-                featured: false,
-                date: "2 days ago"
+                title: "Robotics Breakthrough: Atlas Robot Now Fully Autonomous",
+                description: "Boston Dynamics has released an update allowing Atlas to navigate complex construction sites. The robot can now identify and manipulate tools without human guidance. Commercial availability is expected by 2026.",
+                image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=1000&auto=format&fit=crop",
+                source: "Wired",
+                url: "#",
+                publishedAt: new Date().toISOString()
             }
         ];
 
-        // --- 2. App Logic ---
+        // --- HELPER: Convert Description to Bullet Points ---
+        // Since APIs give paragraphs, we split sentences to simulate "brief notes".
+        function createBulletPoints(text) {
+            if (!text) return "<li>No summary available.</li>";
+            
+            // Split by periods, filter empty strings, take first 3 sentences
+            const sentences = text.split('. ').filter(s => s.length > 10).slice(0, 3);
+            
+            return sentences.map(sentence => {
+                // Add period back if missing
+                const cleanSentence = sentence.trim().endsWith('.') ? sentence.trim() : sentence.trim() + '.';
+                return `<li>${cleanSentence}</li>`;
+            }).join('');
+        }
 
-        const formatDate = () => {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', options);
-        };
+        // --- RENDER FUNCTION ---
+        function renderNews(articles) {
+            newsContainer.innerHTML = ''; // Clear loader
 
-        // Simulate API Fetch
-        const fetchNews = async (category = 'all') => {
-            // UI: Show Loader, Hide Content
-            document.getElementById('loader').classList.remove('hidden');
-            document.getElementById('news-container').classList.add('hidden');
+            articles.forEach(article => {
+                // Handle missing images
+                const imgUrl = article.image || article.urlToImage || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1000&q=80';
+                const sourceName = article.source.name || article.source || 'Unknown Source';
+                const date = new Date(article.publishedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    // Filter data if category is selected
-                    const data = category === 'all' 
-                        ? MOCK_DATA 
-                        : MOCK_DATA.filter(item => item.category === category);
-                    resolve(data);
-                }, 800); // Simulate network delay
+                const cardHTML = `
+                    <div class="news-card">
+                        <div class="card-image-container">
+                            <img src="${imgUrl}" alt="News Image" class="card-image">
+                            <div class="card-overlay">
+                                <div class="card-meta">
+                                    <span class="card-source">${sourceName}</span>
+                                    <span>• AI & TECH</span>
+                                </div>
+                                <h2 class="card-title">${article.title}</h2>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <span class="brief-note-label">Brief Note</span>
+                            <ul class="bullet-points">
+                                ${createBulletPoints(article.description || article.content)}
+                            </ul>
+                            <span class="timestamp">Updated: ${date}</span>
+                            <a href="${article.url}" target="_blank" class="read-more-btn">Read Full Story</a>
+                        </div>
+                    </div>
+                `;
+                newsContainer.innerHTML += cardHTML;
             });
-        };
+        }
 
-        const renderHero = (article) => {
-            const heroSection = document.getElementById('hero-section');
-            if (!article) {
-                heroSection.innerHTML = '';
+        // --- FETCH DATA ---
+        async function fetchNews() {
+            if (USE_MOCK_DATA) {
+                setTimeout(() => renderNews(mockNews), 800); // Simulate delay
                 return;
             }
 
-            heroSection.innerHTML = `
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                    <div class="lg:col-span-7 order-2 lg:order-1">
-                         <span class="font-mono text-tech-red font-bold uppercase tracking-wider text-sm mb-2 block">${article.category}</span>
-                        <h1 class="font-serif font-black text-3xl sm:text-4xl lg:text-5xl leading-tight mb-4 hover:text-gray-700 cursor-pointer transition-colors">
-                            <a href="${article.url}" target="_blank">${article.title}</a>
-                        </h1>
-                        <p class="font-sans text-lg text-gray-600 mb-6 leading-relaxed border-l-4 border-tech-red pl-4">
-                            ${article.summary}
-                        </p>
-                        <div class="flex items-center space-x-4 text-xs font-mono text-gray-500 uppercase tracking-wide">
-                            <span class="font-bold text-black">By ${article.author}</span>
-                            <span>•</span>
-                            <span>${article.date}</span>
-                            <span>•</span>
-                            <a href="${article.url}" target="_blank" class="flex items-center text-tech-red hover:underline group">
-                                Source: ${article.source} <i data-lucide="external-link" class="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-5 order-1 lg:order-2">
-                        <div class="aspect-w-16 aspect-h-9 overflow-hidden">
-                            <img src="${article.image}" alt="${article.title}" class="object-cover w-full h-full grayscale hover:grayscale-0 transition-all duration-500">
-                        </div>
-                    </div>
-                </div>
-            `;
-        };
+            try {
+                // Using GNews API query for "Artificial Intelligence OR Technology"
+                const url = `https://gnews.io/api/v4/search?q="Artificial Intelligence" OR Technology&lang=en&max=10&apikey=${API_KEY}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
 
-        const renderGrid = (articles) => {
-            const grid = document.getElementById('articles-grid');
-            grid.innerHTML = '';
+                if (data.articles) {
+                    renderNews(data.articles);
+                } else {
+                    newsContainer.innerHTML = '<p style="text-align:center; color:#f00;">Error loading news. Check API Key.</p>';
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);
+                newsContainer.innerHTML = '<p style="text-align:center">Failed to connect to news stream.</p>';
+            }
+        }
 
-            articles.forEach(article => {
-                const card = document.createElement('div');
-                card.className = 'article-card flex flex-col h-full border-t border-gray-200 pt-6';
-                card.innerHTML = `
-                    <div class="mb-4 overflow-hidden h-48 relative bg-gray-100">
-                        <span class="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-1 text-xs font-mono font-bold uppercase tracking-wider z-10">
-                            ${article.category}
-                        </span>
-                        <img src="${article.image}" alt="${article.title}" class="w-full h-full object-cover transition-transform duration-700 hover:scale-105">
-                    </div>
-                    <h3 class="font-serif font-bold text-xl leading-tight mb-3 hover:text-tech-red transition-colors cursor-pointer">
-                        <a href="${article.url}" target="_blank">${article.title}</a>
-                    </h3>
-                    <p class="font-sans text-gray-500 text-sm mb-4 flex-grow leading-relaxed line-clamp-3">
-                        ${article.summary}
-                    </p>
-                    <div class="mt-auto flex justify-between items-end pt-4 border-t border-dotted border-gray-300">
-                        <div class="flex flex-col">
-                            <span class="font-mono text-xs font-bold text-black uppercase mb-1">${article.source}</span>
-                            <span class="font-mono text-[10px] text-gray-400">${article.date}</span>
-                        </div>
-                        <a href="${article.url}" target="_blank" class="text-xs font-bold font-mono uppercase tracking-widest text-tech-red hover:bg-tech-red hover:text-white px-2 py-1 transition-all border border-tech-red">
-                            Read Source
-                        </a>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        };
-
-        const initApp = async (filter = 'all') => {
-            const news = await fetchNews(filter);
-            
-            // Separate Hero (first featured item or first item) from the rest
-            let heroArticle = news.find(n => n.featured);
-            if (!heroArticle && news.length > 0) heroArticle = news[0];
-            
-            // Remove hero from grid list to avoid duplication, unless filtering specific categories where we might want to see everything in grid
-            const gridArticles = news.filter(n => n.id !== heroArticle?.id);
-
-            renderHero(heroArticle);
-            renderGrid(gridArticles);
-
-            // UI: Hide Loader, Show Content
-            document.getElementById('loader').classList.add('hidden');
-            document.getElementById('news-container').classList.remove('hidden');
-            
-            // Re-init icons
-            lucide.createIcons();
-        };
-
-        // Filter Handler
-        window.filterNews = (category) => {
-            initApp(category);
-        };
-
-        // --- 3. Startup ---
-        document.addEventListener('DOMContentLoaded', () => {
-            formatDate();
-            initApp();
-            lucide.createIcons();
-        });
+        // Initialize
+        fetchNews();
 
     </script>
 </body>
