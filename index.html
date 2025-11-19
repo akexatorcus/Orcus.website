@@ -1,785 +1,408 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Chess with Integrated Bot</title>
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<style>
-  :root{
-    --board-size: 640px;
-    --light:#f0d9b5;
-    --dark:#b58863;
-    --accent:#2b7a78;
-  }
-  body{
-    background:#222;
-    color:#eee;
-    font-family:Inter,Arial,Helvetica,sans-serif;
-    display:flex;
-    justify-content:center;
-    padding:20px;
-  }
-  .wrap{
-    display:flex;
-    gap:22px;
-    align-items:flex-start;
-  }
-  .board {
-    width:var(--board-size);
-    height:var(--board-size);
-    display:grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    border:6px solid #111;
-    box-shadow: 0 8px 24px rgba(0,0,0,.6);
-  }
-  .square{
-    width:100%;
-    height:100%;
-    user-select:none;
-    position:relative;
-  }
-  .sq-light{ background: var(--light); }
-  .sq-dark{ background: var(--dark); }
-  .coords { font-size:10px; position:absolute; bottom:2px; right:4px; color:rgba(0,0,0,.25);}
-  .piece {
-    width:86%;
-    height:86%;
-    left:7%;
-    top:7%;
-    position:absolute;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:36px;
-    cursor:pointer;
-    touch-action: none;
-  }
-  .highlight {
-    box-shadow: inset 0 0 0 4px rgba(255,255,0,0.35);
-    border-radius:8px;
-  }
-  .target {
-    width:18px;
-    height:18px;
-    border-radius:50%;
-    background: rgba(0,0,0,0.25);
-    position:absolute;
-    left:calc(50% - 9px);
-    top:calc(50% - 9px);
-    pointer-events:none;
-  }
-  .sidebar {
-    width:320px;
-    background:#111;
-    padding:18px;
-    border-radius:10px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.6);
-  }
-  h2{ margin:0 0 12px 0; color:var(--accent) }
-  label,select,input{ display:block; margin:8px 0 }
-  button{
-    background:var(--accent);
-    color:#fff;
-    border:0;
-    padding:10px 14px;
-    border-radius:8px;
-    cursor:pointer;
-    margin-top:8px;
-  }
-  #moves{ max-height:420px; overflow:auto; background:#0b0b0b; padding:8px; border-radius:6px; border:1px solid #222; margin-top:10px; font-family:monospace; font-size:14px;}
-  .status { margin-top:12px; font-weight:600; color:#ddd; }
-  .turn-indicator{ margin-top:10px; padding:10px; border-radius:6px; background:#081; color:#061; display:inline-block; font-weight:700; color:#fff; background:linear-gradient(90deg,#2b7a78,#1b5446); }
-  .small { font-size:13px; color:#ccc; margin-top:8px; }
-  footer { margin-top:12px; color:#999; font-size:12px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Horizon | Curated Tech News</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tech-black': '#121212',
+                        'tech-red': '#F93822', // MIT Tech Review inspired accent
+                        'tech-gray': '#F4F4F4',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+
+        .article-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .article-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Loading Animation */
+        .shimmer {
+            background: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
+        }
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+    </style>
 </head>
-<body>
-<div class="wrap">
-  <div id="board" class="board" aria-label="Chess board"></div>
-
-  <div class="sidebar">
-    <h2>Chess vs Bot</h2>
-    <div><strong>Play as:</strong></div>
-    <label><input type="radio" name="side" value="white" checked> White (you move first)</label>
-    <label><input type="radio" name="side" value="black"> Black</label>
-
-    <div style="margin-top:8px">
-      <label for="depth">AI depth (higher = stronger, slower)</label>
-      <select id="depth">
-        <option value="2">2 (fast)</option>
-        <option value="3" selected>3 (balanced)</option>
-        <option value="4">4 (stronger)</option>
-      </select>
-    </div>
-
-    <button id="newBtn">New Game</button>
-    <button id="undoBtn">Undo Last (player only)</button>
-
-    <div class="status" id="status">Ready</div>
-    <div class="turn-indicator" id="turnIndicator">White to move</div>
-
-    <div class="small">Click a piece to see legal moves. Click a highlighted square to move.</div>
-
-    <div id="moves"></div>
-
-    <footer>Limitations: no castling / no en passant. Promotions auto-queen.</footer>
-  </div>
-</div>
-
-<script>
-/* ---------- SIMPLE CHESS IMPLEMENTATION WITH BOT ----------
-
- Board coordinate convention:
-   rows 0..7 top-to-bottom = rank 8..1
-   cols 0..7 left-to-right = file a..h
-
- Representation:
-   board[r][c] = null or {type: 'p','n','b','r','q','k', color:'w'|'b'}
-*/
-
-/* ---------- Utilities ---------- */
-const PIECE_UNICODE = {
-  'w': { p: '♙', n: '♘', b: '♗', r: '♖', q: '♕', k: '♔' },
-  'b': { p: '♟︎', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' }
-};
-const copyBoard = b => b.map(row => row.map(cell => cell ? {...cell} : null));
-
-/* ---------- Game state ---------- */
-let board = [];
-let turn = 'w'; // 'w' or 'b'
-let selected = null; // {r,c}
-let legalMovesCache = [];
-let history = []; // store moves {from:{r,c}, to:{r,c}, piece, capture, promoted}
-let playerSide = 'w'; // human side
-let aiDepth = 3;
-let thinking = false;
-
-/* ---------- Init / New Game ---------- */
-function newGame() {
-  board = [
-    [r('r','b'), n('n','b'), b('b','b'), q('q','b'), k('k','b'), b('b','b'), n('n','b'), r('r','b')],
-    [p('p','b'), p('p','b'), p('p','b'), p('p','b'), p('p','b'), p('p','b'), p('p','b'), p('p','b')],
-    Array(8).fill(null),
-    Array(8).fill(null),
-    Array(8).fill(null),
-    Array(8).fill(null),
-    [p('p','w'), p('p','w'), p('p','w'), p('p','w'), p('p','w'), p('p','w'), p('p','w'), p('p','w')],
-    [r('r','w'), n('n','w'), b('b','w'), q('q','w'), k('k','w'), b('b','w'), n('n','w'), r('r','w')]
-  ];
-  turn = 'w';
-  selected = null;
-  legalMovesCache = [];
-  history = [];
-  thinking = false;
-  render();
-  updateStatus("New game — good luck!");
-  maybeAIMoveIfNeeded();
-}
-
-function p(t,c){ return {type:'p', color:c}; }
-function n(t,c){ return {type:'n', color:c}; }
-function b(t,c){ return {type:'b', color:c}; }
-function r(t,c){ return {type:'r', color:c}; }
-function q(t,c){ return {type:'q', color:c}; }
-function k(t,c){ return {type:'k', color:c}; }
-
-/* ---------- Board rendering ---------- */
-const boardEl = document.getElementById('board');
-function render(){
-  boardEl.innerHTML = '';
-  for(let r=0;r<8;r++){
-    for(let c=0;c<8;c++){
-      const sq = document.createElement('div');
-      sq.className = 'square ' + (((r+c)%2===0)?'sq-light':'sq-dark');
-      sq.dataset.r = r; sq.dataset.c = c;
-
-      // coordinate labels (optional)
-      const coords = document.createElement('div');
-      coords.className = 'coords';
-      coords.textContent = String.fromCharCode(97+c) + (8-r);
-      sq.appendChild(coords);
-
-      // append piece if exists
-      const piece = board[r][c];
-      if(piece){
-        const pEl = document.createElement('div');
-        pEl.className = 'piece';
-        pEl.dataset.r = r; pEl.dataset.c = c;
-        pEl.dataset.color = piece.color;
-        pEl.dataset.type = piece.type;
-        pEl.innerText = PIECE_UNICODE[piece.color][piece.type];
-        pEl.addEventListener('click', onPieceClick);
-        sq.appendChild(pEl);
-      }
-
-      sq.addEventListener('click', onSquareClick);
-      boardEl.appendChild(sq);
-    }
-  }
-
-  // show highlights for selected legal moves
-  if(selected){
-    const lm = legalMovesCache;
-    // highlight origin
-    const originIdx = (selected.r*8 + selected.c);
-    const originEl = boardEl.children[originIdx];
-    originEl.querySelector('.piece')?.classList.add('highlight');
-
-    for(const m of lm){
-      const idx = m.to.r*8 + m.to.c;
-      const el = boardEl.children[idx];
-      // if capture show red ring; else show target dot
-      if(m.capture) el.classList.add('highlight');
-      const dot = document.createElement('div'); dot.className='target';
-      el.appendChild(dot);
-    }
-  }
-
-  // update move history
-  const movesEl = document.getElementById('moves');
-  movesEl.innerHTML = '';
-  for(let i=0;i<history.length;i++){
-    const mv = history[i];
-    const li = document.createElement('div');
-    li.textContent = (i+1) + '. ' + mvToString(mv);
-    movesEl.appendChild(li);
-  }
-
-  // update turn indicator
-  const turnIndicator = document.getElementById('turnIndicator');
-  turnIndicator.innerText = (turn==='w'?'White':'Black') + ' to move';
-}
-
-function mvToString(m){
-  const f = sqName(m.from), t = sqName(m.to);
-  const promo = m.promotion ? '='+m.promotion.toUpperCase() : '';
-  return (m.piece.color==='w'?'W':'B') + ' ' + (m.piece.type.toUpperCase()) + ': ' + f + '->' + t + promo + (m.capture? ' x':'');
-}
-function sqName({r,c}){ return String.fromCharCode(97+c) + (8-r); }
-
-/* ---------- Click handlers ---------- */
-function onPieceClick(e){
-  e.stopPropagation();
-  if(thinking) return;
-  const el = e.currentTarget;
-  const r = +el.dataset.r, c = +el.dataset.c;
-  const piece = board[r][c];
-  if(!piece) return;
-  // only allow selecting your own side when it's your turn
-  if(piece.color !== turn) return;
-
-  // if click same piece -> deselect
-  if(selected && selected.r===r && selected.c===c){
-    selected = null;
-    legalMovesCache = [];
-    render();
-    return;
-  }
-
-  selected = {r,c};
-  legalMovesCache = generateLegalMovesForSquare(r,c);
-  render();
-}
-
-function onSquareClick(e){
-  if(thinking) return;
-  const r = +e.currentTarget.dataset.r, c = +e.currentTarget.dataset.c;
-  if(!selected) return;
-
-  // check if clicked square is a legal move
-  const found = legalMovesCache.find(m => m.to.r===r && m.to.c===c);
-  if(found){
-    makeMove(found);
-    selected = null;
-    legalMovesCache = [];
-    render();
-    maybeAIMoveIfNeeded();
-  } else {
-    // if you clicked a different piece of yours, select it
-    const piece = board[r][c];
-    if(piece && piece.color === turn){
-      selected = {r,c};
-      legalMovesCache = generateLegalMovesForSquare(r,c);
-      render();
-    } else {
-      // clear selection
-      selected = null; legalMovesCache = []; render();
-    }
-  }
-}
-
-/* ---------- Move generation ---------- */
-
-function generateAllLegalMoves(color){
-  let moves = [];
-  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-    const p = board[r][c];
-    if(p && p.color===color){
-      const ms = generateLegalMovesForSquare(r,c);
-      moves.push(...ms);
-    }
-  }
-  return moves;
-}
-
-function generateLegalMovesForSquare(r,c){
-  const p = board[r][c];
-  if(!p) return [];
-  const pseudo = generatePseudoLegalMoves(r,c,p);
-  // filter moves that leave own king in check
-  const legal = [];
-  for(const m of pseudo){
-    const snapshot = copyBoard(board);
-    makeMoveOnBoard(snapshot, m);
-    if(!isKingAttacked(snapshot, p.color)){
-      legal.push(m);
-    }
-  }
-  return legal;
-}
-
-function generatePseudoLegalMoves(r,c,p){
-  const dir = p.color === 'w' ? -1 : 1;
-  let moves = [];
-  const add = (r2,c2,capture=false, promotion=false) => {
-    if(r2<0||r2>7||c2<0||c2>7) return;
-    // if same color on target, not allowed
-    const target = board[r2][c2];
-    if(target && target.color === p.color) return;
-    moves.push({from:{r,c}, to:{r:r2,c:c2}, piece: {...p}, capture: !!target, promotion});
-  };
-
-  switch(p.type){
-    case 'p': {
-      const fr = r + dir;
-      // forward one
-      if(inBounds(fr,c) && !board[fr][c]){
-        // promotion?
-        const lastRank = (p.color==='w' && fr===0) || (p.color==='b' && fr===7);
-        add(fr,c,false, lastRank);
-        // forward two from starting rank
-        const startRank = (p.color==='w' && r===6) || (p.color==='b' && r===1);
-        if(startRank){
-          const fr2 = r + dir*2;
-          if(inBounds(fr2,c) && !board[fr2][c]) add(fr2,c,false,false);
-        }
-      }
-      // captures
-      for(const dc of [-1,1]){
-        const cr = r + dir, cc = c + dc;
-        if(inBounds(cr,cc) && board[cr][cc] && board[cr][cc].color !== p.color){
-          const lastRank = (p.color==='w' && cr===0) || (p.color==='b' && cr===7);
-          add(cr,cc,true,lastRank);
-        }
-      }
-      // NOTE: en-passant not implemented
-    } break;
-
-    case 'n': {
-      const del = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
-      for(const [dr,dc] of del) add(r+dr,c+dc, false, false);
-    } break;
-
-    case 'b': {
-      for(const [dr,dc] of [[1,1],[1,-1],[-1,1],[-1,-1]]){
-        let rr=r+dr, cc=c+dc;
-        while(inBounds(rr,cc)){
-          if(board[rr][cc]){
-            if(board[rr][cc].color !== p.color) add(rr,cc,true,false);
-            break;
-          } else add(rr,cc,false,false);
-          rr+=dr; cc+=dc;
-        }
-      }
-    } break;
-
-    case 'r': {
-      for(const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1]]){
-        let rr=r+dr, cc=c+dc;
-        while(inBounds(rr,cc)){
-          if(board[rr][cc]){
-            if(board[rr][cc].color !== p.color) add(rr,cc,true,false);
-            break;
-          } else add(rr,cc,false,false);
-          rr+=dr; cc+=dc;
-        }
-      }
-    } break;
-
-    case 'q': {
-      for(const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){
-        let rr=r+dr, cc=c+dc;
-        while(inBounds(rr,cc)){
-          if(board[rr][cc]){
-            if(board[rr][cc].color !== p.color) add(rr,cc,true,false);
-            break;
-          } else add(rr,cc,false,false);
-          rr+=dr; cc+=dc;
-        }
-      }
-    } break;
-
-    case 'k': {
-      for(const dr of [-1,0,1]) for(const dc of [-1,0,1]){
-        if(dr===0 && dc===0) continue;
-        add(r+dr,c+dc,false,false);
-      }
-      // NOTE: castling not implemented
-    } break;
-  }
-  return moves;
-}
-
-function inBounds(r,c){ return r>=0 && r<8 && c>=0 && c<8; }
-
-/* ---------- Move execution ---------- */
-function makeMove(m){
-  // apply move on current board (already validated)
-  const capture = board[m.to.r][m.to.c] ? {...board[m.to.r][m.to.c]} : null;
-  const piece = board[m.from.r][m.from.c];
-  // move
-  board[m.to.r][m.to.c] = {...piece};
-  board[m.from.r][m.from.c] = null;
-  // promotion auto to queen
-  if(m.promotion){
-    board[m.to.r][m.to.c].type = 'q';
-  }
-  history.push({...m, capture});
-  // toggle turn
-  turn = (turn==='w'?'b':'w');
-  render();
-
-  // check end conditions
-  const opponentMoves = generateAllLegalMoves(turn);
-  const kingInCheck = isKingAttacked(board, turn);
-  if(opponentMoves.length === 0){
-    if(kingInCheck){
-      updateStatus((turn==='w'?'White':'Black') + ' is checkmated. ' + (turn==='w'?'Black':'White') + ' wins!');
-    } else {
-      updateStatus("Stalemate — draw.");
-    }
-  } else {
-    updateStatus("");
-  }
-}
-
-function makeMoveOnBoard(bd, m){
-  bd[m.to.r][m.to.c] = {...bd[m.from.r][m.from.c]};
-  bd[m.from.r][m.from.c] = null;
-  if(m.promotion) bd[m.to.r][m.to.c].type = 'q';
-}
-
-/* ---------- King safety detection ---------- */
-function findKing(bd, color){
-  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-    const p = bd[r][c];
-    if(p && p.type==='k' && p.color===color) return {r,c};
-  }
-  return null;
-}
-
-function isKingAttacked(bd, color){
-  const king = findKing(bd, color);
-  if(!king) return true; // no king -> attacked
-  const enemy = color === 'w' ? 'b' : 'w';
-
-  // check pawn attacks
-  const dir = (enemy==='w') ? -1 : 1; // enemy pawn moves up if white
-  for(const dc of [-1,1]){
-    const rr = king.r + dir, cc = king.c + dc;
-    if(inBounds(rr,cc) && bd[rr][cc] && bd[rr][cc].color===enemy && bd[rr][cc].type==='p') return true;
-  }
-
-  // knights
-  const kdel = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
-  for(const [dr,dc] of kdel){
-    const rr=king.r+dr, cc=king.c+dc;
-    if(inBounds(rr,cc) && bd[rr][cc] && bd[rr][cc].color===enemy && bd[rr][cc].type==='n') return true;
-  }
-
-  // sliding: rooks/queens (orthogonal)
-  for(const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1]]){
-    let rr=king.r+dr, cc=king.c+dc;
-    while(inBounds(rr,cc)){
-      if(bd[rr][cc]){
-        if(bd[rr][cc].color===enemy && (bd[rr][cc].type==='r' || bd[rr][cc].type==='q')) return true;
-        break;
-      }
-      rr+=dr; cc+=dc;
-    }
-  }
-  // sliding: bishops/queens (diagonal)
-  for(const [dr,dc] of [[1,1],[1,-1],[-1,1],[-1,-1]]){
-    let rr=king.r+dr, cc=king.c+dc;
-    while(inBounds(rr,cc)){
-      if(bd[rr][cc]){
-        if(bd[rr][cc].color===enemy && (bd[rr][cc].type==='b' || bd[rr][cc].type==='q')) return true;
-        break;
-      }
-      rr+=dr; cc+=dc;
-    }
-  }
-
-  // king proximity
-  for(const dr of [-1,0,1]) for(const dc of [-1,0,1]){
-    if(dr===0 && dc===0) continue;
-    const rr = king.r+dr, cc = king.c+dc;
-    if(inBounds(rr,cc) && bd[rr][cc] && bd[rr][cc].color===enemy && bd[rr][cc].type==='k') return true;
-  }
-
-  return false;
-}
-
-/* ---------- AI: Minimax + Alpha-Beta ---------- */
-
-function maybeAIMoveIfNeeded(){
-  // if it's AI's turn and AI isn't already thinking, start AI.
-  if(thinking) return;
-  if(turn !== playerSide){
-    thinking = true;
-    updateStatus("AI thinking...");
-    setTimeout(async () => {
-      const move = findBestMove(board, turn, aiDepth);
-      if(move) makeMove(move);
-      thinking = false;
-      updateStatus("");
-      render();
-      maybeAIMoveIfNeeded();
-    }, 60); // tiny delay for UI update
-  }
-}
-
-function findBestMove(bd, color, depth){
-  aiDepth = +document.getElementById('depth').value;
-  const maximizing = color === 'w';
-  let best = null;
-  let bestScore = maximizing ? -Infinity : Infinity;
-  const moves = generateAllLegalMoves(color);
-  // quick shuffle for variability
-  moves.sort(()=>Math.random()-0.5);
-
-  for(const m of moves){
-    const snapshot = copyBoard(bd);
-    makeMoveOnBoard(snapshot, m);
-    const score = minimax(snapshot, (color==='w'?'b':'w'), depth-1, -Infinity, Infinity);
-    if(maximizing){
-      if(score > bestScore){ bestScore = score; best = m; }
-    } else {
-      if(score < bestScore){ bestScore = score; best = m; }
-    }
-  }
-  return best;
-}
-
-function minimax(bd, color, depth, alpha, beta){
-  // terminal conditions
-  const legalMoves = generateAllLegalMovesForBoard(bd, color);
-  if(depth===0 || legalMoves.length===0){
-    return evaluateBoard(bd);
-  }
-
-  const maximizing = color === 'w';
-  if(maximizing){
-    let value = -Infinity;
-    for(const m of legalMoves){
-      const snap = copyBoard(bd);
-      makeMoveOnBoard(snap, m);
-      const v = minimax(snap, 'b', depth-1, alpha, beta);
-      value = Math.max(value, v);
-      alpha = Math.max(alpha, value);
-      if(alpha >= beta) break;
-    }
-    return value;
-  } else {
-    let value = Infinity;
-    for(const m of legalMoves){
-      const snap = copyBoard(bd);
-      makeMoveOnBoard(snap, m);
-      const v = minimax(snap, 'w', depth-1, alpha, beta);
-      value = Math.min(value, v);
-      beta = Math.min(beta, value);
-      if(alpha >= beta) break;
-    }
-    return value;
-  }
-}
-
-/* generate legal moves for arbitrary board (used by AI) */
-function generateAllLegalMovesForBoard(bd, color){
-  let moves = [];
-  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-    const p = bd[r][c];
-    if(p && p.color===color){
-      const pseudo = generatePseudoForBoard(bd, r, c, p);
-      for(const m of pseudo){
-        const snap = copyBoard(bd);
-        makeMoveOnBoard(snap, m);
-        if(!isKingAttacked(snap, color)) moves.push(m);
-      }
-    }
-  }
-  return moves;
-}
-
-/* Pseudo-legal generation for a given board */
-function generatePseudoForBoard(bd, r, c, p){
-  const dir = p.color === 'w' ? -1 : 1;
-  let moves = [];
-  const add = (r2,c2,capture=false,promotion=false) => {
-    if(r2<0||r2>7||c2<0||c2>7) return;
-    const target = bd[r2][c2];
-    if(target && target.color === p.color) return;
-    moves.push({from:{r,c}, to:{r:r2,c:c2}, piece: {...p}, capture: !!target, promotion});
-  };
-
-  switch(p.type){
-    case 'p': {
-      const fr = r + dir;
-      if(inBounds(fr,c) && !bd[fr][c]){
-        const lastRank = (p.color==='w' && fr===0) || (p.color==='b' && fr===7);
-        add(fr,c,false,lastRank);
-        const startRank = (p.color==='w' && r===6) || (p.color==='b' && r===1);
-        if(startRank){
-          const fr2 = r + dir*2;
-          if(inBounds(fr2,c) && !bd[fr2][c]) add(fr2,c,false,false);
-        }
-      }
-      for(const dc of [-1,1]){
-        const cr = r + dir, cc = c + dc;
-        if(inBounds(cr,cc) && bd[cr][cc] && bd[cr][cc].color !== p.color){
-          const lastRank = (p.color==='w' && cr===0) || (p.color==='b' && cr===7);
-          add(cr,cc,true,lastRank);
-        }
-      }
-    } break;
-
-    case 'n': {
-      const del = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
-      for(const [dr,dc] of del) add(r+dr,c+dc, false, false);
-    } break;
-
-    case 'b': {
-      for(const [dr,dc] of [[1,1],[1,-1],[-1,1],[-1,-1]]){
-        let rr=r+dr, cc=c+dc;
-        while(inBounds(rr,cc)){
-          if(bd[rr][cc]){
-            if(bd[rr][cc].color !== p.color) add(rr,cc,true,false);
-            break;
-          } else add(rr,cc,false,false);
-          rr+=dr; cc+=dc;
-        }
-      }
-    } break;
-
-    case 'r': {
-      for(const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1]]){
-        let rr=r+dr, cc=c+dc;
-        while(inBounds(rr,cc)){
-          if(bd[rr][cc]){
-            if(bd[rr][cc].color !== p.color) add(rr,cc,true,false);
-            break;
-          } else add(rr,cc,false,false);
-          rr+=dr; cc+=dc;
-        }
-      }
-    } break;
-
-    case 'q': {
-      for(const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){
-        let rr=r+dr, cc=c+dc;
-        while(inBounds(rr,cc)){
-          if(bd[rr][cc]){
-            if(bd[rr][cc].color !== p.color) add(rr,cc,true,false);
-            break;
-          } else add(rr,cc,false,false);
-          rr+=dr; cc+=dc;
-        }
-      }
-    } break;
-
-    case 'k': {
-      for(const dr of [-1,0,1]) for(const dc of [-1,0,1]){
-        if(dr===0 && dc===0) continue;
-        add(r+dr,c+dc,false,false);
-      }
-    } break;
-  }
-  return moves;
-}
-
-/* ---------- Board evaluation ---------- */
-const PIECE_VALUE = { p:100, n:320, b:330, r:500, q:900, k:20000 };
-
-function evaluateBoard(bd){
-  let score = 0;
-  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-    const p = bd[r][c];
-    if(p){
-      const val = PIECE_VALUE[p.type];
-      score += (p.color==='w' ? val : -val);
-    }
-  }
-  // additional small factor: mobility
-  const wMoves = generateAllLegalMovesForBoard(bd,'w').length;
-  const bMoves = generateAllLegalMovesForBoard(bd,'b').length;
-  score += 4 * (wMoves - bMoves);
-  return score;
-}
-
-/* ---------- Helper UI / status / controls ---------- */
-function updateStatus(txt){
-  const el = document.getElementById('status');
-  el.innerText = txt;
-}
-
-/* ---------- Controls ---------- */
-document.getElementById('newBtn').addEventListener('click', ()=>{
-  const side = document.querySelector('input[name=side]:checked').value;
-  playerSide = (side==='white'?'w':'b');
-  newGame();
-});
-document.getElementById('depth').addEventListener('change', ()=>{ aiDepth = +document.getElementById('depth').value; });
-
-document.getElementById('undoBtn').addEventListener('click', ()=>{
-  if(history.length===0) return;
-  // only allow user to undo their last move if it's currently AI's turn? We'll simply revert last 1-2 halfmoves so that player can undo their last move.
-  // Reconstruct board from history except last move
-  const steps = Math.min(history.length, 1);
-  for(let i=0;i<steps;i++) history.pop();
-  // rebuild board from initial position and apply history
-  rebuildFromHistory();
-  turn = 'w';
-  selected = null; legalMovesCache=[];
-  render();
-});
-
-function rebuildFromHistory(){
-  // reset to starting, then replay history
-  board = [
-    [r('r','b'), n('n','b'), b('b','b'), q('q','b'), k('k','b'), b('b','b'), n('n','b'), r('r','b')],
-    [p('p','b'), p('p','b'), p('p','b'), p('p','b'), p('p','b'), p('p','b'), p('p','b'), p('p','b')],
-    Array(8).fill(null),
-    Array(8).fill(null),
-    Array(8).fill(null),
-    Array(8).fill(null),
-    [p('p','w'), p('p','w'), p('p','w'), p('p','w'), p('p','w'), p('p','w'), p('p','w'), p('p','w')],
-    [r('r','w'), n('n','w'), b('b','w'), q('q','w'), k('k','w'), b('b','w'), n('n','w'), r('r','w')]
-  ];
-  for(const mv of history){
-    makeMoveOnBoard(board, mv);
-  }
-}
-
-/* ---------- Startup ---------- */
-// initial setup
-document.querySelectorAll('input[name=side]').forEach(r => r.addEventListener('change', e=> {
-  playerSide = e.target.value==='white'?'w':'b';
-}));
-document.getElementById('depth').value = '3';
-newGame();
-
-</script>
+<body class="bg-white text-tech-black font-sans antialiased">
+
+    <!-- Top Bar -->
+    <header class="border-b-4 border-tech-black sticky top-0 z-50 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Mobile Menu Button -->
+                <button class="lg:hidden p-2" id="mobile-menu-btn">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center space-x-2">
+                    <div class="bg-tech-black text-white font-bold font-mono px-2 py-1 text-xl tracking-tighter">TH</div>
+                    <span class="font-serif font-black text-xl sm:text-2xl tracking-tight hidden sm:block">TECH HORIZON</span>
+                </div>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden lg:flex space-x-8">
+                    <a href="#" class="font-mono text-sm font-bold hover:text-tech-red uppercase tracking-wider" onclick="filterNews('all')">All</a>
+                    <a href="#" class="font-mono text-sm font-bold hover:text-tech-red uppercase tracking-wider" onclick="filterNews('AI')">AI</a>
+                    <a href="#" class="font-mono text-sm font-bold hover:text-tech-red uppercase tracking-wider" onclick="filterNews('Biotech')">Biotech</a>
+                    <a href="#" class="font-mono text-sm font-bold hover:text-tech-red uppercase tracking-wider" onclick="filterNews('Computing')">Computing</a>
+                    <a href="#" class="font-mono text-sm font-bold hover:text-tech-red uppercase tracking-wider" onclick="filterNews('Climate')">Climate</a>
+                </nav>
+
+                <!-- Search/Subscribe -->
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 hover:text-tech-red transition-colors">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </button>
+                    <button class="hidden sm:block bg-tech-red text-white font-bold font-mono text-xs px-4 py-2 hover:bg-black transition-colors uppercase">
+                        Subscribe
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Current Date -->
+        <div class="flex items-center justify-between border-b border-gray-200 pb-4 mb-8">
+            <p id="current-date" class="font-mono text-sm text-gray-500 uppercase tracking-widest"></p>
+            <div class="flex items-center space-x-2 text-xs font-mono text-tech-red animate-pulse">
+                <span class="w-2 h-2 bg-tech-red rounded-full"></span>
+                <span>LIVE FEED</span>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loader" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8 h-96 shimmer"></div>
+            <div class="lg:col-span-4 space-y-4">
+                <div class="h-24 shimmer"></div>
+                <div class="h-24 shimmer"></div>
+                <div class="h-24 shimmer"></div>
+            </div>
+        </div>
+
+        <!-- News Container -->
+        <div id="news-container" class="hidden">
+            <!-- Hero Section (Injected via JS) -->
+            <section id="hero-section" class="mb-16 border-b border-black pb-12"></section>
+
+            <!-- The Latest (Grid) -->
+            <div class="flex items-center mb-8">
+                <h2 class="font-serif font-bold text-3xl mr-4">The Latest</h2>
+                <div class="h-1 bg-black flex-grow"></div>
+            </div>
+            
+            <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                <!-- Articles injected here -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-tech-black text-white py-12 mt-12">
+        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="col-span-1">
+                <div class="bg-white text-tech-black font-bold font-mono px-2 py-1 text-xl inline-block mb-4">TH</div>
+                <p class="font-serif text-gray-400 text-sm">Curating the future, today.</p>
+            </div>
+            <div>
+                <h4 class="font-mono font-bold text-sm uppercase mb-4 text-gray-500">Topics</h4>
+                <ul class="space-y-2 text-sm font-sans">
+                    <li><a href="#" class="hover:text-tech-red">Artificial Intelligence</a></li>
+                    <li><a href="#" class="hover:text-tech-red">Biotechnology</a></li>
+                    <li><a href="#" class="hover:text-tech-red">Climate Change</a></li>
+                </ul>
+            </div>
+             <div>
+                <h4 class="font-mono font-bold text-sm uppercase mb-4 text-gray-500">Company</h4>
+                <ul class="space-y-2 text-sm font-sans">
+                    <li><a href="#" class="hover:text-tech-red">About Us</a></li>
+                    <li><a href="#" class="hover:text-tech-red">Advertise</a></li>
+                    <li><a href="#" class="hover:text-tech-red">Careers</a></li>
+                </ul>
+            </div>
+             <div>
+                <h4 class="font-mono font-bold text-sm uppercase mb-4 text-gray-500">Connect</h4>
+                <div class="flex space-x-4">
+                    <i data-lucide="twitter" class="w-5 h-5 hover:text-tech-red cursor-pointer"></i>
+                    <i data-lucide="facebook" class="w-5 h-5 hover:text-tech-red cursor-pointer"></i>
+                    <i data-lucide="linkedin" class="w-5 h-5 hover:text-tech-red cursor-pointer"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- 1. Configuration & Mock Data ---
+        
+        // In a real app, you would replace MOCK_DATA with an API call to NewsAPI, GNews, or Mediastack.
+        // Example: const API_URL = 'https://newsapi.org/v2/top-headlines?category=technology&apiKey=YOUR_KEY';
+        
+        const MOCK_DATA = [
+            {
+                id: 1,
+                title: "The AI that can smell: Google's new olfactory network maps molecules to odors",
+                summary: "Researchers have created a principal odor map that allows computers to predict how a molecule will smell, potentially digitizing scent.",
+                category: "AI",
+                author: "Melissa Heikkilä",
+                source: "DeepMind Research",
+                url: "https://deepmind.google/discover/",
+                image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1200",
+                featured: true,
+                date: "2 hours ago"
+            },
+            {
+                id: 2,
+                title: "CRISPR 2.0: The next generation of gene editing is here",
+                summary: "New techniques are making gene editing more precise and versatile than ever before, opening doors to curing genetic diseases.",
+                category: "Biotech",
+                author: "Antonio Regalado",
+                source: "Nature Biotechnology",
+                url: "https://www.nature.com/nbt/",
+                image: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&q=80&w=800",
+                featured: false,
+                date: "4 hours ago"
+            },
+            {
+                id: 3,
+                title: "Why we need to rethink carbon capture immediately",
+                summary: "Direct air capture is expensive and energy-intensive. New thermodynamic approaches might solve the efficiency puzzle.",
+                category: "Climate",
+                author: "James Temple",
+                source: "Climate Change News",
+                url: "https://www.climatechangenews.com/",
+                image: "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&q=80&w=800",
+                featured: false,
+                date: "6 hours ago"
+            },
+            {
+                id: 4,
+                title: "The quantum internet is getting closer to reality",
+                summary: "Physicists have successfully teleported quantum information across a metropolitan network, paving the way for unhackable comms.",
+                category: "Computing",
+                author: "Chen Ly",
+                source: "Phys.org",
+                url: "https://phys.org/",
+                image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=800",
+                featured: false,
+                date: "12 hours ago"
+            },
+            {
+                id: 5,
+                title: "Electric planes are finally taking off for short hauls",
+                summary: "Battery density has improved enough to make regional electric flights commercially viable by 2026.",
+                category: "Climate",
+                author: "Casey Crownhart",
+                source: "Aviation Week",
+                url: "https://aviationweek.com/",
+                image: "https://images.unsplash.com/photo-1483304528321-0674f0040030?auto=format&fit=crop&q=80&w=800",
+                featured: false,
+                date: "1 day ago"
+            },
+            {
+                id: 6,
+                title: "Python overtakes C as the most popular language for embedded systems",
+                summary: "MicroPython's rise signals a shift in how hardware is programmed, favoring speed of development over raw cycle efficiency.",
+                category: "Computing",
+                author: "Harry Guinness",
+                source: "IEEE Spectrum",
+                url: "https://spectrum.ieee.org/",
+                image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=800",
+                featured: false,
+                date: "1 day ago"
+            },
+            {
+                id: 7,
+                title: "Generative AI in Medicine: A double-edged sword?",
+                summary: "While LLMs can diagnose rare diseases, hallucination risks remain a critical barrier to FDA approval.",
+                category: "AI",
+                author: "Will Douglas Heaven",
+                source: "The Lancet Digital Health",
+                url: "https://www.thelancet.com/digital-health",
+                image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800",
+                featured: false,
+                date: "2 days ago"
+            }
+        ];
+
+        // --- 2. App Logic ---
+
+        const formatDate = () => {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', options);
+        };
+
+        // Simulate API Fetch
+        const fetchNews = async (category = 'all') => {
+            // UI: Show Loader, Hide Content
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('news-container').classList.add('hidden');
+
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // Filter data if category is selected
+                    const data = category === 'all' 
+                        ? MOCK_DATA 
+                        : MOCK_DATA.filter(item => item.category === category);
+                    resolve(data);
+                }, 800); // Simulate network delay
+            });
+        };
+
+        const renderHero = (article) => {
+            const heroSection = document.getElementById('hero-section');
+            if (!article) {
+                heroSection.innerHTML = '';
+                return;
+            }
+
+            heroSection.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-7 order-2 lg:order-1">
+                         <span class="font-mono text-tech-red font-bold uppercase tracking-wider text-sm mb-2 block">${article.category}</span>
+                        <h1 class="font-serif font-black text-3xl sm:text-4xl lg:text-5xl leading-tight mb-4 hover:text-gray-700 cursor-pointer transition-colors">
+                            <a href="${article.url}" target="_blank">${article.title}</a>
+                        </h1>
+                        <p class="font-sans text-lg text-gray-600 mb-6 leading-relaxed border-l-4 border-tech-red pl-4">
+                            ${article.summary}
+                        </p>
+                        <div class="flex items-center space-x-4 text-xs font-mono text-gray-500 uppercase tracking-wide">
+                            <span class="font-bold text-black">By ${article.author}</span>
+                            <span>•</span>
+                            <span>${article.date}</span>
+                            <span>•</span>
+                            <a href="${article.url}" target="_blank" class="flex items-center text-tech-red hover:underline group">
+                                Source: ${article.source} <i data-lucide="external-link" class="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-5 order-1 lg:order-2">
+                        <div class="aspect-w-16 aspect-h-9 overflow-hidden">
+                            <img src="${article.image}" alt="${article.title}" class="object-cover w-full h-full grayscale hover:grayscale-0 transition-all duration-500">
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        const renderGrid = (articles) => {
+            const grid = document.getElementById('articles-grid');
+            grid.innerHTML = '';
+
+            articles.forEach(article => {
+                const card = document.createElement('div');
+                card.className = 'article-card flex flex-col h-full border-t border-gray-200 pt-6';
+                card.innerHTML = `
+                    <div class="mb-4 overflow-hidden h-48 relative bg-gray-100">
+                        <span class="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-1 text-xs font-mono font-bold uppercase tracking-wider z-10">
+                            ${article.category}
+                        </span>
+                        <img src="${article.image}" alt="${article.title}" class="w-full h-full object-cover transition-transform duration-700 hover:scale-105">
+                    </div>
+                    <h3 class="font-serif font-bold text-xl leading-tight mb-3 hover:text-tech-red transition-colors cursor-pointer">
+                        <a href="${article.url}" target="_blank">${article.title}</a>
+                    </h3>
+                    <p class="font-sans text-gray-500 text-sm mb-4 flex-grow leading-relaxed line-clamp-3">
+                        ${article.summary}
+                    </p>
+                    <div class="mt-auto flex justify-between items-end pt-4 border-t border-dotted border-gray-300">
+                        <div class="flex flex-col">
+                            <span class="font-mono text-xs font-bold text-black uppercase mb-1">${article.source}</span>
+                            <span class="font-mono text-[10px] text-gray-400">${article.date}</span>
+                        </div>
+                        <a href="${article.url}" target="_blank" class="text-xs font-bold font-mono uppercase tracking-widest text-tech-red hover:bg-tech-red hover:text-white px-2 py-1 transition-all border border-tech-red">
+                            Read Source
+                        </a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        };
+
+        const initApp = async (filter = 'all') => {
+            const news = await fetchNews(filter);
+            
+            // Separate Hero (first featured item or first item) from the rest
+            let heroArticle = news.find(n => n.featured);
+            if (!heroArticle && news.length > 0) heroArticle = news[0];
+            
+            // Remove hero from grid list to avoid duplication, unless filtering specific categories where we might want to see everything in grid
+            const gridArticles = news.filter(n => n.id !== heroArticle?.id);
+
+            renderHero(heroArticle);
+            renderGrid(gridArticles);
+
+            // UI: Hide Loader, Show Content
+            document.getElementById('loader').classList.add('hidden');
+            document.getElementById('news-container').classList.remove('hidden');
+            
+            // Re-init icons
+            lucide.createIcons();
+        };
+
+        // Filter Handler
+        window.filterNews = (category) => {
+            initApp(category);
+        };
+
+        // --- 3. Startup ---
+        document.addEventListener('DOMContentLoaded', () => {
+            formatDate();
+            initApp();
+            lucide.createIcons();
+        });
+
+    </script>
 </body>
 </html>
-
